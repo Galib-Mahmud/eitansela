@@ -4,22 +4,42 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
+  final Color backgroundColor;
+  final Color textColor;
+  final double borderRadius;
 
-  const CustomButton({required this.text, required this.onPressed});
-
-  static const Color primary = Colors.black;
+  const CustomButton({
+    Key? key,
+    required this.text,
+    required this.onPressed,
+    this.backgroundColor = const Color(0xFF2CBCB6), // Teal color
+    this.textColor = Colors.white,
+    this.borderRadius = 25,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: primary, // Use the defined primary color
-          minimumSize: const Size(double.infinity, 50),
+          backgroundColor: backgroundColor,
+          minimumSize: Size(double.infinity, 50.h),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
         ),
-        child: Text(style: TextStyle(color: Colors.white,fontSize: 16.sp,fontFamily: 'Poppins'),text),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 16.sp,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

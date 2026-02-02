@@ -9,9 +9,9 @@ class CustomBackButton extends StatelessWidget {
 
   const CustomBackButton({
     super.key,
-    this.backgroundColor = Colors.black,
+    this.backgroundColor = const Color(0xFF2CBCB6), // Teal color
     this.iconColor = Colors.white,
-    this.size = 45,
+    this.size = 40,
     this.onTap,
   });
 
@@ -20,8 +20,8 @@ class CustomBackButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap ?? () => Navigator.of(context).pop(),
       child: Container(
-        width: size,
-        height: size,
+        width: size.w,
+        height: size.h,
         decoration: BoxDecoration(
           color: backgroundColor,
           shape: BoxShape.circle,
@@ -29,6 +29,7 @@ class CustomBackButton extends StatelessWidget {
         child: Icon(
           Icons.arrow_back,
           color: iconColor,
+          size: 20.sp,
         ),
       ),
     );

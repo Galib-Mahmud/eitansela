@@ -1,36 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:get/get.dart';
 
 import '../../../widget/auth/custom_back_button.dart';
 import '../../../widget/auth/custom_button.dart';
 import '../../../widget/auth/custom_text_field.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  _SignInScreenState createState() => _SignInScreenState();
+  _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _mobileController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _reEnterPasswordController = TextEditingController();
 
   @override
   void dispose() {
+    _fullNameController.dispose();
     _emailController.dispose();
+    _mobileController.dispose();
     _passwordController.dispose();
+    _reEnterPasswordController.dispose();
     super.dispose();
   }
 
-  void _login() {
-    print('Login attempted with email: ${_emailController.text}');
+  void _signUp() {
+    // Validate passwords match
+    if (_passwordController.text != _reEnterPasswordController.text) {
+      Get.snackbar(
+        'Error',
+        'Passwords do not match',
+
+      );
+      return;
+    }
+    print('Sign Up attempted with email: ${_emailController.text}');
+    // Get.toNamed(RouteName.homeScreen);
   }
 
-  void _navigateToSignUp() {
-    print('Navigate to Sign Up screen');
-    // Get.toNamed(RouteName.signup);
+  void _navigateToLogin() {
+    print('Navigate to Login screen');
+    // Get.toNamed(RouteName.signIn);
   }
 
   @override
@@ -58,37 +75,20 @@ class _SignInScreenState extends State<SignInScreen> {
                 Center(
                   child: Image.asset(
                     'assets/images/auth/signin.png',
-
                   ),
                 ),
 
-                // Welcome Text
-                Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        "Welcome Back!",
-                        style: TextStyle(
-                          fontFamily: "Inter",
-                          fontSize: 24.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        "Log in to discover your perfect match",
-                        style: TextStyle(
-                          fontFamily: "Inter",
-                          fontSize: 14.sp,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
+                SizedBox(height: 20.h),
+
+                // Full Name TextField
+                CustomTextField(
+                  icon: Icons.person_outline,
+                  labelText: 'Enter Full Name',
+                  controller: _fullNameController,
+                  keyboardType: TextInputType.name,
                 ),
 
-                SizedBox(height: 30.h),
+                SizedBox(height: 16.h),
 
                 // Email TextField
                 CustomTextField(
@@ -96,6 +96,16 @@ class _SignInScreenState extends State<SignInScreen> {
                   labelText: 'Enter Email Address',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                ),
+
+                SizedBox(height: 16.h),
+
+                // Mobile Number TextField
+                CustomTextField(
+                  icon: Icons.phone_outlined,
+                  labelText: 'Enter Mobile Number',
+                  controller: _mobileController,
+                  keyboardType: TextInputType.phone,
                 ),
 
                 SizedBox(height: 16.h),
@@ -108,63 +118,32 @@ class _SignInScreenState extends State<SignInScreen> {
                   obscureText: true,
                 ),
 
-                // Forgot Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // Get.toNamed(RouteName.resetPass);
-                    },
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                       color: Colors.grey,
-                        fontSize: 14.sp,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  ),
-                ),
-
                 SizedBox(height: 16.h),
 
-                // Sign In Button
+                // Re-Enter Password TextField
+                CustomTextField(
+                  icon: Icons.lock_outline,
+                  labelText: 'Re Enter Password',
+                  controller: _reEnterPasswordController,
+                  obscureText: true,
+                ),
+
+                SizedBox(height: 30.h),
+
+                // Sign Up Button
                 CustomButton(
-                  text: 'Sign In',
-                  onPressed: () {
-                    _login();
-                    // Get.toNamed(RouteName.homeScreen);
-                  },
+                  text: 'Sign Up',
+                  onPressed: _signUp,
                 ),
 
                 SizedBox(height: 20.h),
 
-                // Divider with "or" text (optional)
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Text(
-                        'or',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                  ],
-                ),
-
-                SizedBox(height: 20.h),
-
-                // Don't have an account? Sign Up
+                // Already have an account? Login Here
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an account? ",
+                      "Already have an account? ",
                       style: TextStyle(
                         fontFamily: "Inter",
                         fontSize: 14.sp,
@@ -172,9 +151,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: _navigateToSignUp,
+                      onTap: _navigateToLogin,
                       child: Text(
-                        "Sign Up",
+                        "Login Here",
                         style: TextStyle(
                           fontFamily: "Inter",
                           fontSize: 14.sp,

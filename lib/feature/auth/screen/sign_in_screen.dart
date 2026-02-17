@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../routes/route_name.dart';
 import '../../../widget/auth/custom_back_button.dart';
 import '../../../widget/auth/custom_button.dart';
 import '../../../widget/auth/custom_text_field.dart';
@@ -25,12 +26,12 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   void _login() {
-    print('Login attempted with email: ${_emailController.text}');
+
   }
 
   void _navigateToSignUp() {
-    print('Navigate to Sign Up screen');
-    // Get.toNamed(RouteName.signup);
+
+    Get.toNamed(RouteName.signup);
   }
 
   @override
@@ -113,7 +114,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      // Get.toNamed(RouteName.resetPass);
+                      Get.toNamed(RouteName.resetPass);
                     },
                     child: Text(
                       'Forgot Password?',
@@ -132,8 +133,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 CustomButton(
                   text: 'Sign In',
                   onPressed: () {
-                    _login();
-                    // Get.toNamed(RouteName.homeScreen);
+                    Get.toNamed(RouteName.main);
                   },
                 ),
 

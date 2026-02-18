@@ -24,6 +24,7 @@ class RouteName{
   static const String homepage = '/homepage';
   static const String jobrequest = '/jobrequest';
   static const String earning = '/earningpage';
+  static const String profilepage = '/profilepage';
 
 
 

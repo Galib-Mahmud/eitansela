@@ -20,6 +20,7 @@ import '../feature/home/screen/new_request_screen.dart';
 import '../feature/home/screen/professional_screen.dart';
 import '../feature/professional/screen/eraningpage.dart';
 import '../feature/professional/screen/jobrequestpage.dart';
+import '../feature/professional/screen/profilepage.dart';
 import '../feature/profile/screen/profile_screen.dart';
 import '../feature/profile/screen/save_address.dart';
 import '../feature/splash/screen/onboarding_screen2.dart';
@@ -53,6 +54,7 @@ class AppRoute {
     GetPage(name: RouteName.homepage, page: () => Homepage()),
     GetPage(name: RouteName.jobrequest, page: () => JobRequestPage()),
     GetPage(name: RouteName.earning, page: () => EarningsPage()),
+    GetPage(name: RouteName.profilepage, page: () => ProfilePage()),
 
 
 

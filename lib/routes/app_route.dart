@@ -18,6 +18,7 @@ import '../feature/home/screen/my_request_screen.dart';
 import '../feature/home/screen/new_req1_screen.dart';
 import '../feature/home/screen/new_request_screen.dart';
 import '../feature/home/screen/professional_screen.dart';
+import '../feature/professional/screen/eraningpage.dart';
 import '../feature/professional/screen/jobrequestpage.dart';
 import '../feature/profile/screen/profile_screen.dart';
 import '../feature/profile/screen/save_address.dart';
@@ -51,6 +52,7 @@ class AppRoute {
     // Sohan
     GetPage(name: RouteName.homepage, page: () => Homepage()),
     GetPage(name: RouteName.jobrequest, page: () => JobRequestPage()),
+    GetPage(name: RouteName.earning, page: () => EarningsPage()),
 
 
 

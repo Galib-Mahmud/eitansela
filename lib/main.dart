@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          initialRoute: RouteName.chat,
+          initialRoute: RouteName.homepage,
           getPages: AppRoute.pages,
         );
       },

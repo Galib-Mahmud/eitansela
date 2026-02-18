@@ -1,4 +1,5 @@
 import 'package:eitansela/feature/auth/screen/sign_in_screen.dart';
+import 'package:eitansela/feature/professional/screen/homepage.dart';
 import 'package:eitansela/feature/splash/screen/onboarding_screen1.dart';
 import 'package:eitansela/feature/splash/screen/splash_screen.dart';
 import 'package:eitansela/routes/route_name.dart';
@@ -46,6 +47,8 @@ class AppRoute {
     GetPage(name: RouteName.professional, page: () => ProfessionalScreen()),
     GetPage(name: RouteName.chat, page: () => ProfessionalChatScreen()),
 
+    // Sohan
+    GetPage(name: RouteName.homepage, page: () => Homepage()),
 
 
 

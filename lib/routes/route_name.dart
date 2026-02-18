@@ -20,6 +20,8 @@ class RouteName{
   static const String professional = '/professional';
   static const String chat = '/chat';
 
+  //Sohan
+  static const String homepage = '/homepage';
 
 
 

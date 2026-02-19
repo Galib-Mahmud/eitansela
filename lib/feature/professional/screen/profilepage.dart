@@ -161,8 +161,6 @@ class ProfilePage extends StatelessWidget {
           ],
         ),
       ),
-
-      bottomNavigationBar: _buildBottomNav(3),
     );
   }
 
@@ -313,27 +311,6 @@ Widget _buildStarRating(double rating) {
     }),
   );
 }
-
-BottomNavigationBar _buildBottomNav(int currentIndex) {
-  return BottomNavigationBar(
-    currentIndex: currentIndex,
-    selectedItemColor: const Color(0xFFFFC107),
-    unselectedItemColor: Colors.grey[400],
-    showUnselectedLabels: true,
-    type: BottomNavigationBarType.fixed,
-    elevation: 8,
-    selectedLabelStyle: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600),
-    unselectedLabelStyle: TextStyle(fontSize: 10.sp),
-    items: const [
-      BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
-      BottomNavigationBarItem(icon: Icon(Icons.list_alt_outlined), label: 'Request'),
-      BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet_outlined), label: 'Earnings'),
-      BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-    ],
-  );
-}
-
-
 // ALL REVIEWS PAGE
 
 class AllReviewsPage extends StatelessWidget {
@@ -372,8 +349,6 @@ class AllReviewsPage extends StatelessWidget {
           ],
         ),
       ),
-
-      bottomNavigationBar: _buildBottomNav(3),
     );
   }
 

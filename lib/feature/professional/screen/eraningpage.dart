@@ -473,21 +473,6 @@ class _EarningsPageState extends State<EarningsPage> {
         ),
       ),
 
-      // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        selectedItemColor: const Color(0xFFFFC107),
-        unselectedItemColor: Colors.grey[400],
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        elevation: 8,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt_outlined), label: 'Jobs'),
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money_outlined), label: 'Earnings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-        ],
-      ),
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:eitansela/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -113,7 +114,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         style: TextStyle(
                           fontFamily: "Inter",
                           fontSize: 24.sp,
-                          color: Color(0xFF2CBCB6),
+                          color: Color(0xFFF8C106),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -164,7 +165,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.r),
                               borderSide: BorderSide(
-                                color: Color(0xFF2CBCB6),
+                                color: Color(0xFFF8C106),
                                 width: 2,
                               ),
                             ),
@@ -184,7 +185,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 // Verify Code Button
                 CustomButton(
                   text: 'Verify Code',
-                  onPressed: _verifyCode,
+                  onPressed: () {
+                    Get.toNamed(RouteName.resetPass);
+                  },
                 ),
 
                 SizedBox(height: 20.h),
@@ -208,7 +211,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         style: TextStyle(
                           fontFamily: "Inter",
                           fontSize: 14.sp,
-                          color: Color(0xFF2CBCB6),
+                          color: Color(0xFFF8C106),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

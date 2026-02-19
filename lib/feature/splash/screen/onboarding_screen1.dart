@@ -64,7 +64,7 @@ class Onboarding1Screen extends StatelessWidget {
 
             // Next button
              CustomButton(text: "Next", onPressed: () {
-               Get.toNamed(RouteName.onboarding2);
+               Get.toNamed(RouteName.signin);
              },),
 
             SizedBox(height: 30.h),

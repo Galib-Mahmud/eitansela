@@ -1,3 +1,4 @@
+import 'package:eitansela/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -32,7 +33,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                 // Back button
                 CustomBackButton(),
 
-                SizedBox(height: 16.h),
+                SizedBox(height: 40.h),
 
                 // Logo Image
                 Center(
@@ -52,7 +53,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: "Inter",
                           fontSize: 24.sp,
-                          color: Color(0xFF2CBCB6),
+                          color: Color(0xFFF8C106),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -74,8 +75,10 @@ class PasswordResetSuccessScreen extends StatelessWidget {
 
                 // Update Password / Back to Login Button
                 CustomButton(
-                  text: 'Update Password',
-                  onPressed: _goToLogin,
+                  text: 'Sign in',
+                  onPressed: () {
+                    Get.toNamed(RouteName.signin);
+                  },
                 ),
 
                 SizedBox(height: 30.h),

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MyRequest extends StatefulWidget {
-  const MyRequest({Key? key}) : super(key: key);
+  const MyRequest({super.key});
 
   @override
   State<MyRequest> createState() => _MyRequestState();
@@ -16,96 +16,106 @@ class _MyRequestState extends State<MyRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: const Color(0xFF212121),
-            size: 24.sp,
-          ),
-          onPressed: () => Get.back(),
-        ),
-        title: Text(
-          'My Request',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF212121),
-          ),
-        ),
-        centerTitle: false,
-      ),
-      body: Column(
-        children: [
-          SizedBox(height: 16.h),
-          // Tab Bar
-          _buildTabBar(),
-          SizedBox(height: 16.h),
-          // Request List
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              children: [
-                _buildRequestCard(
-                 IconPath: 'assets/images/profile/water.png',
-                  iconColor: const Color(0xFF2196F3),
-                  iconBgColor: const Color(0xFFE3F2FD),
-                  service: 'Plumbing',
-                  date: 'Oct 24, 2025',
-                  total: '₦450',
-                  distance: '2.3 km',
-                  status: 'Completed',
-                  statusColor: const Color(0xFF4CAF50),
-                  statusBgColor: const Color(0xFFE8F5E9),
-                ),
-                SizedBox(height: 16.h),
-                _buildRequestCard(
-                 IconPath: 'assets/images/profile/2.png',
-                  iconColor: const Color(0xFFFFA726),
-                  iconBgColor: const Color(0xFFFFF3E0),
-                  service: 'Electrical',
-                  date: 'Oct 24, 2025',
-                  total: '₦320',
-                  distance: '2.3 km',
-                  status: 'Completed',
-                  statusColor: const Color(0xFF4CAF50),
-                  statusBgColor: const Color(0xFFE8F5E9),
-                ),
-                SizedBox(height: 16.h),
-                _buildRequestCard(
-                 IconPath: 'assets/images/profile/water.png',
-                  iconColor: const Color(0xFF2196F3),
-                  iconBgColor: const Color(0xFFE3F2FD),
-                  service: 'Plumbing',
-                  date: 'Oct 24, 2025',
-                  total: '₦0',
-                  distance: '2.3 km',
-                  status: 'Cancelled',
-                  statusColor: Colors.white,
-                  statusBgColor: const Color(0xFFF44336),
-                ),
-              ],
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16.h),
+            // App bar
+            _buildAppBar(),
+            SizedBox(height: 20.h),
+            // Tab bar
+            _buildTabBar(),
+            SizedBox(height: 16.h),
+            // Request list
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                children: [
+                  SizedBox(height: 4.h),
+                  _buildRequestCard(
+                    iconPath: 'assets/images/profile/water.png',
+                    service: 'Plumbing',
+                    date: 'Oct 24, 2023',
+                    total: '₪450',
+                    distance: '2.3 km',
+                    status: 'Completed',
+                    statusColor: const Color(0xFF4CAF50),
+                    statusBgColor: const Color(0xFFE8F5E9),
+                  ),
+                  SizedBox(height: 16.h),
+                  _buildRequestCard(
+                    iconPath: 'assets/images/profile/2.png',
+                    service: 'Electrical',
+                    date: 'Oct 24, 2023',
+                    total: '₪320',
+                    distance: '2.3 km',
+                    status: 'Completed',
+                    statusColor: const Color(0xFF4CAF50),
+                    statusBgColor: const Color(0xFFE8F5E9),
+                  ),
+                  SizedBox(height: 16.h),
+                  _buildRequestCard(
+                    iconPath: 'assets/images/profile/water.png',
+                    service: 'Plumbing',
+                    date: 'Oct 24, 2023',
+                    total: '₪0',
+                    distance: '2.3 km',
+                    status: 'Cancelled',
+                    statusColor: Colors.white,
+                    statusBgColor: const Color(0xFFF44336),
+                  ),
+                  SizedBox(height: 90.h),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-
     );
   }
 
-  Widget _buildTabBar() {
+  // ───────────────────── App Bar ─────────────────────────────────────
+  Widget _buildAppBar() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(
         children: [
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Icon(
+              Icons.arrow_back,
+              color: const Color(0xFF212121),
+              size: 24.sp,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Text(
+            'My Request',
+            style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF212121),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ───────────────────── Tab Bar ─────────────────────────────────────
+  Widget _buildTabBar() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Row(
+        children: [
           _buildTab('All'),
-          SizedBox(width: 12.w),
+          SizedBox(width: 10.w),
           _buildTab('Active'),
-          SizedBox(width: 12.w),
+          SizedBox(width: 10.w),
           _buildTab('Completed'),
-          SizedBox(width: 12.w),
+          SizedBox(width: 10.w),
           _buildTab('Cancelled'),
         ],
       ),
@@ -115,18 +125,16 @@ class _MyRequestState extends State<MyRequest> {
   Widget _buildTab(String label) {
     bool isSelected = selectedTab == label;
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedTab = label;
-        });
-      },
+      onTap: () => setState(() => selectedTab = label),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF00B4A8) : Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
+          color: isSelected ? const Color(0xFFF8C106) : Colors.white,
+          borderRadius: BorderRadius.circular(24.r),
           border: Border.all(
-            color: isSelected ? const Color(0xFF00B4A8) : const Color(0xFFE0E0E0),
+            color: isSelected
+                ? const Color(0xFFF8C106)
+                : const Color(0xFFE0E0E0),
             width: 1,
           ),
         ),
@@ -142,10 +150,9 @@ class _MyRequestState extends State<MyRequest> {
     );
   }
 
+  // ───────────────────── Request Card ────────────────────────────────
   Widget _buildRequestCard({
-    required String IconPath,
-    required Color iconColor,
-    required Color iconBgColor,
+    required String iconPath,
     required String service,
     required String date,
     required String total,
@@ -155,35 +162,29 @@ class _MyRequestState extends State<MyRequest> {
     required Color statusBgColor,
   }) {
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(
+          color: const Color(0xFFEEEEEE),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
-          // Top Row: Icon, Service Name, Status
+          // Top row: icon + service + status
           Row(
             children: [
-              // Service Icon
-              Container(
+              // Service icon
+              Image.asset(
+                iconPath,
                 width: 40.w,
                 height: 40.w,
-                decoration: BoxDecoration(
-                  color: iconBgColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(IconPath),
+                fit: BoxFit.contain,
               ),
-              SizedBox(width: 12.w),
-              // Service Name and Date
+              SizedBox(width: 14.w),
+              // Service name + date
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,8 +192,8 @@ class _MyRequestState extends State<MyRequest> {
                     Text(
                       service,
                       style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
                         color: const Color(0xFF212121),
                       ),
                     ),
@@ -202,14 +203,14 @@ class _MyRequestState extends State<MyRequest> {
                         Icon(
                           Icons.calendar_today_outlined,
                           size: 12.sp,
-                          color: const Color(0xFF9E9E9E),
+                          color: const Color(0xFFBDBDBD),
                         ),
                         SizedBox(width: 4.w),
                         Text(
                           date,
                           style: TextStyle(
                             fontSize: 12.sp,
-                            color: const Color(0xFF9E9E9E),
+                            color: const Color(0xFFBDBDBD),
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -218,17 +219,17 @@ class _MyRequestState extends State<MyRequest> {
                   ],
                 ),
               ),
-              // Status Badge
+              // Status badge
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                 decoration: BoxDecoration(
                   color: statusBgColor,
-                  borderRadius: BorderRadius.circular(6.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Text(
                   status,
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
                     color: statusColor,
                   ),
@@ -236,8 +237,18 @@ class _MyRequestState extends State<MyRequest> {
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          // Bottom Row: Total and Distance
+
+          // Divider line
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 14.h),
+            child: Divider(
+              color: const Color(0xFFEEEEEE),
+              height: 1,
+              thickness: 1,
+            ),
+          ),
+
+          // Bottom row: total + distance
           Row(
             children: [
               // Total
@@ -248,8 +259,8 @@ class _MyRequestState extends State<MyRequest> {
                     Text(
                       'Total',
                       style: TextStyle(
-                        fontSize: 11.sp,
-                        color: const Color(0xFF9E9E9E),
+                        fontSize: 12.sp,
+                        color: const Color(0xFFBDBDBD),
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -257,7 +268,7 @@ class _MyRequestState extends State<MyRequest> {
                     Text(
                       total,
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF212121),
                       ),
@@ -266,79 +277,41 @@ class _MyRequestState extends State<MyRequest> {
                 ),
               ),
               // Distance
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Distance',
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: const Color(0xFF9E9E9E),
-                        fontWeight: FontWeight.w400,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Distance',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: const Color(0xFFBDBDBD),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 14.sp,
+                        color: const Color(0xFFBDBDBD),
                       ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          size: 14.sp,
-                          color: const Color(0xFF9E9E9E),
+                      SizedBox(width: 3.w),
+                      Text(
+                        distance,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF212121),
                         ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          distance,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFF212121),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required IconData activeIcon,
-    required String label,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              color: isActive ? const Color(0xFF00B4A8) : const Color(0xFF9E9E9E),
-              size: 24.sp,
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: isActive ? const Color(0xFF00B4A8) : const Color(0xFF9E9E9E),
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

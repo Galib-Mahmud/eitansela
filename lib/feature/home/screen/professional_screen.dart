@@ -5,88 +5,94 @@ import 'package:get/get.dart';
 import '../../../routes/route_name.dart';
 
 class ProfessionalScreen extends StatelessWidget {
-  const ProfessionalScreen({Key? key}) : super(key: key);
+  const ProfessionalScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-            size: 20.sp,
-          ),
-          onPressed: () => Get.back(),
-        ),
-        title: Text(
-          'Professional',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF212121),
-          ),
-        ),
-        centerTitle: false,
-      ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-        children: [
-          _buildProfessionalCard(
-            name: 'John Moyer',
-            profession: 'Plumber',
-            priceRange: '₪150-₪350',
-            imagePath: 'assets/images/profile/profile.png',
-            rating: '100% Trusted',
-            onTap: () {
-              // Navigate to professional details
-              Get.toNamed('/professional-details');
-            },
-            onDiscussPrice: () {
-              // Handle discuss pricing
-            },
-          ),
-          SizedBox(height: 12.h),
-          _buildProfessionalCard(
-            name: 'John Moyer',
-            profession: 'Plumber',
-            priceRange: '₪150-₪350',
-            imagePath: 'assets/images/profile/profile.png',
-            rating: '100% Trusted',
-            onTap: () {
-              Get.toNamed('/professional-details');
-            },
-            onDiscussPrice: () {},
-          ),
-          SizedBox(height: 12.h),
-          _buildProfessionalCard(
-            name: 'John Moyer',
-            profession: 'Plumber',
-            priceRange: '₪150-₪350',
-            imagePath: 'assets/images/profile/profile.png',
-            rating: '100% Trusted',
-            onTap: () {
-              Get.toNamed('/professional-details');
-            },
-            onDiscussPrice: () {},
-          ),
-          SizedBox(height: 12.h),
-          _buildProfessionalCard(
-            name: 'John Moyer',
-            profession: 'Plumber',
-            priceRange: '₪150-₪350',
-            imagePath: 'assets/images/profile/profile.png',
-            rating: '100% Trusted',
-            onTap: () {
-              Get.toNamed(RouteName.chat);
-            },
-            onDiscussPrice: () {Get.toNamed(RouteName.chat);},
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16.h),
+            // App bar
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Get.back(),
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: const Color(0xFF212121),
+                      size: 24.sp,
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Text(
+                    'Professional',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF212121),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Divider(
+              color: const Color(0xFFEEEEEE),
+              thickness: 1,
+              height: 1,
+            ),
 
-          ),
-        ],
+            // List
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                children: [
+                  _buildProfessionalCard(
+                    name: 'John Mayer',
+                    profession: 'Plumber',
+                    priceRange: '₪150-₪350',
+                    imagePath: 'assets/images/profile/profile.png',
+                    onTap: () => Get.toNamed(RouteName.chat),
+                    onDiscussPrice: () => Get.toNamed(RouteName.chat),
+                  ),
+                  SizedBox(height: 14.h),
+                  _buildProfessionalCard(
+                    name: 'John Mayer',
+                    profession: 'Plumber',
+                    priceRange: '₪150-₪350',
+                    imagePath: 'assets/images/profile/profile.png',
+                    onTap: () => Get.toNamed(RouteName.chat),
+                    onDiscussPrice: () => Get.toNamed(RouteName.chat),
+                  ),
+                  SizedBox(height: 14.h),
+                  _buildProfessionalCard(
+                    name: 'John Mayer',
+                    profession: 'Plumber',
+                    priceRange: '₪150-₪350',
+                    imagePath: 'assets/images/profile/profile.png',
+                    onTap: () => Get.toNamed(RouteName.chat),
+                    onDiscussPrice: () => Get.toNamed(RouteName.chat),
+                  ),
+                  SizedBox(height: 14.h),
+                  _buildProfessionalCard(
+                    name: 'John Mayer',
+                    profession: 'Plumber',
+                    priceRange: '₪150-₪350',
+                    imagePath: 'assets/images/profile/profile.png',
+                    onTap: () => Get.toNamed(RouteName.chat),
+                    onDiscussPrice: () => Get.toNamed(RouteName.chat),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -96,7 +102,6 @@ class ProfessionalScreen extends StatelessWidget {
     required String profession,
     required String priceRange,
     required String imagePath,
-    required String rating,
     required VoidCallback onTap,
     required VoidCallback onDiscussPrice,
   }) {
@@ -104,74 +109,101 @@ class ProfessionalScreen extends StatelessWidget {
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(
+          color: const Color(0xFFEEEEEE),
+          width: 1,
+        ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Verified Badge and Rating
+          // Row 1: Verified badge + 100% Trusted
           Row(
             children: [
-              // Verified Icon
+              // Green shield check icon
               Container(
-                padding: EdgeInsets.all(4.w),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
+                width: 26.w,
+                height: 26.w,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFE8F5E9),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.check,
+                  Icons.verified_user,
                   color: const Color(0xFF4CAF50),
-                  size: 12.sp,
+                  size: 16.sp,
                 ),
               ),
-              SizedBox(width: 6.w),
+              SizedBox(width: 8.w),
               Text(
                 'Verified Professional',
                 style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w700,
                   color: const Color(0xFF212121),
                 ),
               ),
-              Spacer(),
-              Text(
-                rating,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF4CAF50),
+              const Spacer(),
+              // 100% Trusted badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8F5E9),
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
+                child: Text(
+                  '100% Trusted',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF4CAF50),
+                  ),
                 ),
               ),
             ],
           ),
 
-          SizedBox(height: 16.h),
+          SizedBox(height: 14.h),
 
-          // Professional Info Row
+          // Row 2: Avatar + Name + Profession + Arrow
           Row(
             children: [
-              // Profile Image
-              Container(
+              // Profile image with green online dot
+              SizedBox(
                 width: 48.w,
                 height: 48.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: AssetImage(imagePath),
-                    fit: BoxFit.cover,
-                  ),
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 48.w,
+                      height: 48.w,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage(imagePath),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    // Green online dot
+                    Positioned(
+                      bottom: 2,
+                      left: 2,
+                      child: Container(
+                        width: 12.w,
+                        height: 12.w,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4CAF50),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(width: 12.w),
-              // Name and Profession
+              // Name + Profession
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,26 +211,27 @@ class ProfessionalScreen extends StatelessWidget {
                     Text(
                       name,
                       style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
                         color: const Color(0xFF212121),
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 3.h),
                     Row(
                       children: [
-                        Icon(
-                          Icons.verified_user,
-                          color: const Color(0xFF00B4A8),
-                          size: 14.sp,
+                        // Water drop icon
+                        Image.asset(
+                          'assets/images/profile/water.png',
+                          width: 14.w,
+                          height: 14.w,
+                          fit: BoxFit.contain,
                         ),
                         SizedBox(width: 4.w),
                         Text(
                           profession,
                           style: TextStyle(
-                            fontSize: 12.sp,
-                            color: const Color(0xFF757575),
-                            fontWeight: FontWeight.w400,
+                            fontSize: 13.sp,
+                            color: const Color(0xFF9E9E9E),
                           ),
                         ),
                       ],
@@ -206,21 +239,30 @@ class ProfessionalScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // Arrow Icon
+              // Yellow arrow
               GestureDetector(
                 onTap: onTap,
                 child: Icon(
-                  Icons.arrow_forward_ios,
-                  color: const Color(0xFF00B4A8),
-                  size: 18.sp,
+                  Icons.chevron_right,
+                  color: const Color(0xFFF8C106),
+                  size: 28.sp,
                 ),
               ),
             ],
           ),
 
-          SizedBox(height: 16.h),
+          SizedBox(height: 14.h),
 
-          // Price Range and Discuss Button
+          // Divider
+          Divider(
+            color: const Color(0xFFEEEEEE),
+            thickness: 1,
+            height: 1,
+          ),
+
+          SizedBox(height: 14.h),
+
+          // Row 3: Price Range + Discuss Pricing button
           Row(
             children: [
               // Price Range
@@ -231,9 +273,8 @@ class ProfessionalScreen extends StatelessWidget {
                     Text(
                       'Price Range',
                       style: TextStyle(
-                        fontSize: 11.sp,
+                        fontSize: 12.sp,
                         color: const Color(0xFF9E9E9E),
-                        fontWeight: FontWeight.w400,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -242,27 +283,28 @@ class ProfessionalScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF00B4A8),
+                        color: const Color(0xFFF8C106),
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 12.w),
-              // Discuss Pricing Button
+              // Discuss Pricing button
               GestureDetector(
-
                 onTap: onDiscussPrice,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 18.w,
+                    vertical: 10.h,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00B4A8),
-                    borderRadius: BorderRadius.circular(8.r),
+                    color: const Color(0xFFF8C106),
+                    borderRadius: BorderRadius.circular(22.r),
                   ),
                   child: Text(
                     'Discuss Pricing',
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),

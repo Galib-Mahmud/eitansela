@@ -1,10 +1,7 @@
 import 'package:eitansela/feature/home/screen/home_screen.dart';
 import 'package:eitansela/feature/home/screen/my_request_screen.dart';
-import 'package:eitansela/feature/home/screen/my_request_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:eitansela/routes/route_name.dart';
 
 import '../profile/screen/profile_screen.dart';
 
@@ -15,10 +12,10 @@ class MainScreen extends StatefulWidget {
   final int initialIndex;
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreen1State();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreen1State extends State<MainScreen> {
   int _currentIndex = 0;
 
   @override
@@ -44,7 +41,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildBottomNavigationBar() {
     return Container(
-      height: 65.h,
+      height: 70.h,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -59,37 +56,19 @@ class _MainScreenState extends State<MainScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(
-            icon: Icons.home_outlined,
-            activeIcon: Icons.home,
+            iconPath: 'assets/images/auth/home.png',
             label: 'Home',
-            isActive: _currentIndex == 0,
-            onTap: () {
-              setState(() {
-                _currentIndex = 0;
-              });
-            },
+            index: 0,
           ),
           _buildNavItem(
-            icon: Icons.assignment_outlined,
-            activeIcon: Icons.assignment,
-            label: 'Bookings',
-            isActive: _currentIndex == 1,
-            onTap: () {
-              setState(() {
-                _currentIndex = 1;
-              });
-            },
+            iconPath: 'assets/images/auth/request.png',
+            label: 'Request',
+            index: 1,
           ),
           _buildNavItem(
-            icon: Icons.person_outline,
-            activeIcon: Icons.person,
-            label: 'Account',
-            isActive: _currentIndex == 2,
-            onTap: () {
-              setState(() {
-                _currentIndex = 2;
-              });
-            },
+            iconPath: 'assets/images/auth/profile.png',
+            label: 'Profile',
+            index: 2,
           ),
         ],
       ),
@@ -97,31 +76,50 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildNavItem({
-    required IconData icon,
-    required IconData activeIcon,
+    required String iconPath,
     required String label,
-    required bool isActive,
-    required VoidCallback onTap,
+    required int index,
   }) {
+    final bool isActive = _currentIndex == index;
+
     return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.h),
+      onTap: () => setState(() => _currentIndex = index),
+      child: SizedBox(
+        width: 70.w,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              color: isActive ? const Color(0xFF00B4A8) : const Color(0xFF9E9E9E),
-              size: 24.sp,
+            // Yellow top indicator bar
+            Container(
+              width: 30.w,
+              height: 3.h,
+              decoration: BoxDecoration(
+                color: isActive
+                    ? const Color(0xFFF8C106)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            // Icon
+            Image.asset(
+              iconPath,
+              width: 24.sp,
+              height: 24.sp,
+              color: isActive
+                  ? const Color(0xFFF8C106)
+                  : const Color(0xFF9E9E9E),
             ),
             SizedBox(height: 4.h),
+            // Label
             Text(
               label,
               style: TextStyle(
                 fontSize: 11.sp,
-                color: isActive ? const Color(0xFF00B4A8) : const Color(0xFF9E9E9E),
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                color: isActive
+                    ? const Color(0xFFF8C106)
+                    : const Color(0xFF9E9E9E),
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
           ],

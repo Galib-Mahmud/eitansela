@@ -1,3 +1,4 @@
+import 'package:eitansela/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -74,7 +75,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         style: TextStyle(
                           fontFamily: "Inter",
                           fontSize: 24.sp,
-                          color: Color(0xFF2CBCB6),
+                          color: Color(0xFFF8C106),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -106,8 +107,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // Reset Password Button
                 CustomButton(
-                  text: 'Reset Password',
-                  onPressed: _resetPassword,
+                  text: 'Get OTP',
+                  onPressed: () {
+                    Get.toNamed(RouteName.otpVerification);
+                  },
                 ),
 
                 SizedBox(height: 30.h),

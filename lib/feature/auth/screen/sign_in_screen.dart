@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../routes/route_name.dart';
-import '../../../widget/auth/custom_back_button.dart';
 import '../../../widget/auth/custom_button.dart';
 import '../../../widget/auth/custom_text_field.dart';
 
@@ -25,12 +24,7 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  void _login() {
-
-  }
-
   void _navigateToSignUp() {
-
     Get.toNamed(RouteName.signup);
   }
 
@@ -46,46 +40,36 @@ class _SignInScreenState extends State<SignInScreen> {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 50.h),
-
-                // Back button
-                CustomBackButton(),
-
-                SizedBox(height: 16.h),
+                SizedBox(height: 120.h),
 
                 // Logo Image
                 Center(
                   child: Image.asset(
                     'assets/images/auth/signin.png',
-
                   ),
                 ),
 
+                SizedBox(height: 20.h),
+
                 // Welcome Text
-                Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        "Welcome Back!",
-                        style: TextStyle(
-                          fontFamily: "Inter",
-                          fontSize: 24.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        "Log in to discover your perfect match",
-                        style: TextStyle(
-                          fontFamily: "Inter",
-                          fontSize: 14.sp,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
+                Text(
+                  "Welcome Back!",
+                  style: TextStyle(
+                    fontFamily: "Inter",
+                    fontSize: 24.sp,
+                    color: const Color(0xFFF8C106),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  "Log in to discover your perfect match",
+                  style: TextStyle(
+                    fontFamily: "Inter",
+                    fontSize: 14.sp,
+                    color: Colors.grey,
                   ),
                 ),
 
@@ -109,20 +93,19 @@ class _SignInScreenState extends State<SignInScreen> {
                   obscureText: true,
                 ),
 
+                SizedBox(height: 16.h),
+
                 // Forgot Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Get.toNamed(RouteName.resetPass);
-                    },
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                       color: Colors.grey,
-                        fontSize: 14.sp,
-                        fontFamily: 'Inter',
-                      ),
+                TextButton(
+                  onPressed: () {
+                    Get.toNamed(RouteName.forgetPass);
+                  },
+                  child: Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14.sp,
+                      fontFamily: 'Inter',
                     ),
                   ),
                 ),
@@ -133,31 +116,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 CustomButton(
                   text: 'Sign In',
                   onPressed: () {
-                    Get.toNamed(RouteName.main);
+                    Get.toNamed(RouteName.onboarding2);
                   },
                 ),
 
-                SizedBox(height: 20.h),
-
-                // Divider with "or" text (optional)
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Text(
-                        'or',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                  ],
-                ),
-
-                SizedBox(height: 20.h),
+                SizedBox(height: 30.h),
 
                 // Don't have an account? Sign Up
                 Row(
@@ -178,7 +141,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         style: TextStyle(
                           fontFamily: "Inter",
                           fontSize: 14.sp,
-                          color: Color(0xFF2CBCB6),
+                          color: const Color(0xFFF8C106),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

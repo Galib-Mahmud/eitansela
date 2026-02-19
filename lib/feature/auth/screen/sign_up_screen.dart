@@ -1,3 +1,4 @@
+import 'package:eitansela/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -69,7 +70,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // Back button
                 CustomBackButton(),
 
-                SizedBox(height: 16.h),
+                SizedBox(height: 30.h),
 
                 // Logo Image
                 Center(
@@ -78,7 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
 
-                SizedBox(height: 20.h),
+                SizedBox(height: 30.h),
 
                 // Full Name TextField
                 CustomTextField(
@@ -133,7 +134,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // Sign Up Button
                 CustomButton(
                   text: 'Sign Up',
-                  onPressed: _signUp,
+                  onPressed: () {
+                    Get.toNamed(RouteName.signin);
+                  },
                 ),
 
                 SizedBox(height: 20.h),
@@ -157,7 +160,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           fontFamily: "Inter",
                           fontSize: 14.sp,
-                          color: Color(0xFF2CBCB6),
+                          color: Color(0xFFF8C106),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

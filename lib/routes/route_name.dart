@@ -4,13 +4,16 @@ class RouteName{
   static const String signin = '/signin';
   static const String signup = '/signup';
   static const String resetPass = '/resetPass';
+  static const String forgetPass = '/forgetPass';
   static const String resetPassSucess = '/resetPassSucess';
+  static const String otpVerification = '/otpVerification';
   static const String splashScreen = '/splashScreen';
   static const String onboarding1 = '/onboarding1';
   static const String onboarding2 = '/onboarding2';
   static const String onboarding3 = '/onboarding3';
   static const String home = '/home';
   static const String myRequest = '/myRequest';
+  static const String recentRequest = '/recentRequest';
   static const String main = '/main';
   static const String profile = '/profile';
   static const String savedAddresses = '/savedAddresses';
@@ -19,6 +22,16 @@ class RouteName{
   static const String newRequestScreen1 = '/newRequestScreen1';
   static const String professional = '/professional';
   static const String chat = '/chat';
+  static const String location = '/location';
+  static const String confirmReq = '/confirmReq';
+  static const String review = '/review';
+  static const String close = '/close';
+
+
+//Professional
+
+  static const String main1 = '/main1';
+
 
   //Sohan
   static const String homepage = '/homepage';

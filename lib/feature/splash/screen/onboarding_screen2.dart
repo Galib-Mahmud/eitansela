@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../routes/route_name.dart';
+
 class Onboarding2Screen extends StatefulWidget {
   const Onboarding2Screen({super.key});
 
@@ -65,7 +67,7 @@ class _Onboarding2ScreenState extends State<Onboarding2Screen> {
 
                     // Role cards
                     Padding(
-                      padding: EdgeInsets.only(left: 24.w, right: 24.w),
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
                       child: Column(
                         children: [
                           _buildRoleCard(
@@ -73,7 +75,7 @@ class _Onboarding2ScreenState extends State<Onboarding2Screen> {
                             title: 'Customer',
                             subtitle: 'Book trusted home services',
                           ),
-                          SizedBox(height: 16.h),
+                          SizedBox(height: 14.h),
                           _buildRoleCard(
                             index: 1,
                             title: 'Professional',
@@ -97,7 +99,11 @@ class _Onboarding2ScreenState extends State<Onboarding2Screen> {
                 height: 54.h,
                 child: ElevatedButton(
                   onPressed: () {
-                    Get.toNamed('/onboarding3');
+                    if (_selectedRole == 0) {
+                      Get.toNamed(RouteName.main);
+                    } else {
+                      Get.toNamed(RouteName.main1);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFC107),
@@ -151,7 +157,7 @@ class _Onboarding2ScreenState extends State<Onboarding2Screen> {
           boxShadow: isSelected
               ? [
             BoxShadow(
-              color: const Color(0xFFFFC107).withOpacity(0.3),
+              color: const Color(0xFFFFC107).withOpacity(0.1),
               blurRadius: 10,
               spreadRadius: 0,
               offset: const Offset(0, 2),

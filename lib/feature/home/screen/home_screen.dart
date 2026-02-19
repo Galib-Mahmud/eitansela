@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeDashboardScreen extends StatelessWidget {
-  const HomeDashboardScreen({Key? key}) : super(key: key);
+  const HomeDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,262 +16,174 @@ class HomeDashboardScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 16.h),
-
-              // Header Section
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Row(
-                  children: [
-                    // Profile Image
-                    Container(
-                      width: 44.w,
-                      height: 44.w,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/profile/profile.png'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    // Greeting
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Good Morning!',
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: const Color(0xFF757575),
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            'Kurt Cobain',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF212121),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Notification Icon
-                    Container(
-                      width: 40.w,
-                      height: 40.w,
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Icon(
-                              Icons.notifications_none,
-                              color: Colors.black,
-                              size: 26.sp,
-                            ),
-                          ),
-                          Positioned(
-                            right: 10.w,
-                            top: 10.h,
-                            child: Container(
-                              width: 8.w,
-                              height: 8.w,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF00B4A8),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 22.h),
-
-              // Search Bar
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Container(
-                  height: 50.h,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: const Color(0xFF00B4A8),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.search,
-                        color: const Color(0xFF00B4A8),
-                        size: 22.sp,
-                      ),
-                      SizedBox(width: 12.w),
-                      Text(
-                        'What do you need help with?',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: const Color(0xFF00B4A8),
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
+              _buildHeader(),
+              SizedBox(height: 20.h),
+              _buildSearchBar(),
               SizedBox(height: 24.h),
-
-              // Recent Request Section Header
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Recent Request',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF212121),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.toNamed('/my-requests');
-                      },
-                      child: Text(
-                        'See All',
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: const Color(0xFF00B4A8),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
+              _buildRecentRequestHeader(),
               SizedBox(height: 12.h),
-
-              // Recent Request Cards
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Column(
-                  children: [
-                    _buildRecentRequestCard(
-                      iconPath: 'assets/images/profile/water.png',
-                      title: 'Kitchen Sink Leak',
-                      date: 'Oct 24 - Complete',
-                      status: 'In Process',
-                      onTap: () {
-                        Get.toNamed(RouteName.myRequest);
-                      },
-                    ),
-                    SizedBox(height: 10.h),
-                    _buildRecentRequestCard(
-                      iconPath: 'assets/images/profile/water.png',
-                      title: 'Kitchen Sink Leak',
-                      date: 'Oct 24 - Complete',
-                      status: 'In Process',
-                    ),
-                  ],
-                ),
-              ),
-
+              _buildRecentRequests(),
               SizedBox(height: 24.h),
-
-              // Services Grid
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 16.w,
-                  mainAxisSpacing: 16.h,
-                  childAspectRatio: 1.0,
-                  children: [
-                    _buildServiceCard(
-                      onTap: () {
-                        Get.toNamed(RouteName.newRequest);
-                      },
-                      imagePath: 'assets/images/profile/water.png',
-                      label: 'Plumbing',
-                    ),
-                    _buildServiceCard(
-                      onTap: () {
-                        Get.toNamed(RouteName.newRequest);
-                      },
-                      imagePath: 'assets/images/profile/2.png',
-                      label: 'Electrical',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/3.png',
-                      label: 'Ac & HVAC',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/4.png',
-                      label: 'Locksmith',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/5.png',
-                      label: 'Handymen',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/6.png',
-                      label: 'Carpentry',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/7.png',
-                      label: 'Painting',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/8.png',
-                      label: 'Moving',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/9.png',
-                      label: 'Appliances',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/10.png',
-                      label: 'Glass',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/11.png',
-                      label: 'Roofing',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/12.png',
-                      label: 'Gardening',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/13.png',
-                      label: 'IT/NET',
-                    ),
-                    _buildServiceCard(
-                      imagePath: 'assets/images/profile/14.png',
-                      label: 'Pest Control',
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 90.h), // Bottom padding for navigation bar
+              _buildServicesGrid(),
+              SizedBox(height: 90.h),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // ───────────────────────── Header ──────────────────────────────────
+  Widget _buildHeader() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Row(
+        children: [
+          // Profile Image
+          Container(
+            width: 50.w,
+            height: 50.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: const DecorationImage(
+                image: AssetImage('assets/images/profile/profile.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SizedBox(width: 12.w),
+          // Greeting
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Good Morning!',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: const Color(0xFF757575),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  'Kurt Cobain',
+                  style: TextStyle(
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF212121),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Notification Icon
+          GestureDetector(
+            onTap: () {},
+            child: Icon(
+              Icons.notifications_none_rounded,
+              color: const Color(0xFF424242),
+              size: 26.sp,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ───────────────────── Search Bar ──────────────────────────────────
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Container(
+        height: 50.h,
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: const Color(0xFFE0E0E0),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.search,
+              color: const Color(0xFFBDBDBD),
+              size: 22.sp,
+            ),
+            SizedBox(width: 12.w),
+            Text(
+              'What do you need help with?',
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: const Color(0xFFBDBDBD),
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ───────────────── Recent Request Header ───────────────────────────
+  Widget _buildRecentRequestHeader() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Recent Request',
+            style: TextStyle(
+              fontSize: 17.sp,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF212121),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Get.toNamed(RouteName.recentRequest);
+            },
+            child: Text(
+              'See All',
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: const Color(0xFF9E9E9E),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ───────────────── Recent Request Cards ────────────────────────────
+  Widget _buildRecentRequests() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Column(
+        children: [
+          _buildRecentRequestCard(
+            iconPath: 'assets/images/profile/water.png',
+            title: 'Kitchen Sink Leak',
+            date: 'oct 24 - Complete',
+            status: 'IN Process',
+            onTap: () {
+              Get.toNamed(RouteName.myRequest);
+            },
+          ),
+          SizedBox(height: 12.h),
+          _buildRecentRequestCard(
+            iconPath: 'assets/images/profile/water.png',
+            title: 'Kitchen Sink Leak',
+            date: 'oct 24 - Complete',
+            status: 'IN Process',
+          ),
+        ],
       ),
     );
   }
@@ -286,33 +198,25 @@ class HomeDashboardScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(14.w),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: const Color(0xFFE8E8E8),
+            width: 1,
+          ),
         ),
         child: Row(
           children: [
             // Icon
-            Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE3F2FD),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Image.asset(
-                iconPath,
-                fit: BoxFit.cover,
-              ),
+            Image.asset(
+              iconPath,
+              width: 36.w,
+              height: 36.w,
+              fit: BoxFit.contain,
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 14.w),
             // Title and Date
             Expanded(
               child: Column(
@@ -321,17 +225,17 @@ class HomeDashboardScreen extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF212121),
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 3.h),
                   Text(
                     date,
                     style: TextStyle(
-                      fontSize: 11.sp,
-                      color: const Color(0xFF9E9E9E),
+                      fontSize: 12.sp,
+                      color: const Color(0xFFBDBDBD),
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -340,22 +244,58 @@ class HomeDashboardScreen extends StatelessWidget {
             ),
             // Status Badge
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
               decoration: BoxDecoration(
-                color: const Color(0xFFE0F7F6),
-                borderRadius: BorderRadius.circular(6.r),
+                color: const Color(0xFFE0F2F1),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Text(
                 status,
                 style: TextStyle(
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF00B4A8),
+                  color: const Color(0xFF00897B),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // ───────────────────── Services Grid ───────────────────────────────
+  Widget _buildServicesGrid() {
+    final services = [
+      {'image': 'assets/images/profile/water.png', 'label': 'Plumbing'},
+      {'image': 'assets/images/profile/2.png', 'label': 'Electrical'},
+      {'image': 'assets/images/profile/3.png', 'label': 'Ac & HVAC'},
+      {'image': 'assets/images/profile/7.png', 'label': 'Painting'},
+      {'image': 'assets/images/profile/8.png', 'label': 'Moving'},
+      {'image': 'assets/images/profile/12.png', 'label': 'Gardening'},
+    ];
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 14.w,
+          mainAxisSpacing: 14.h,
+          childAspectRatio: 0.95,
+        ),
+        itemCount: services.length,
+        itemBuilder: (context, index) {
+          return _buildServiceCard(
+            imagePath: services[index]['image']!,
+            label: services[index]['label']!,
+            onTap: () {
+              Get.toNamed(RouteName.newRequest);
+            },
+          );
+        },
       ),
     );
   }
@@ -369,36 +309,29 @@ class HomeDashboardScreen extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: const Color(0xFFE8E8E8),
+            width: 1,
+          ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Service Icon/Image
-            Container(
-              width: 48.w,
-              height: 48.w,
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.contain,
-              ),
+            Image.asset(
+              imagePath,
+              width: 44.w,
+              height: 44.w,
+              fit: BoxFit.contain,
             ),
             SizedBox(height: 8.h),
-            // Service Label
             Text(
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
                 color: const Color(0xFF212121),
               ),
             ),

@@ -16,8 +16,8 @@ import '../feature/home/screen/my_request_screen.dart';
 import '../feature/home/screen/my_request_screen.dart';
 
 import '../feature/home/screen/new_req1_screen.dart';
-import '../feature/home/screen/new_request_screen.dart';
 import '../feature/home/screen/professional_screen.dart';
+import '../feature/home/screen/service_request.dart';
 import '../feature/professional/screen/activejobscreen.dart';
 import '../feature/professional/screen/eraningpage.dart';
 import '../feature/professional/screen/jobrequestpage.dart';

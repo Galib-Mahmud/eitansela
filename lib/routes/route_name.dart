@@ -20,6 +20,13 @@ class RouteName{
   static const String professional = '/professional';
   static const String chat = '/chat';
 
+  //Sohan
+  static const String homepage = '/homepage';
+  static const String jobrequest = '/jobrequest';
+  static const String earning = '/earningpage';
+  static const String profilepage = '/profilepage';
+  static const String activejobscreen = '/activejobscreen';
+  static const String onboardingFlow = '/onboarding';
 
 
 

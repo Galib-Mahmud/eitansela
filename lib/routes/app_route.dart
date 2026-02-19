@@ -1,4 +1,5 @@
 import 'package:eitansela/feature/auth/screen/sign_in_screen.dart';
+import 'package:eitansela/feature/professional/screen/homepage.dart';
 import 'package:eitansela/feature/splash/screen/onboarding_screen1.dart';
 import 'package:eitansela/feature/splash/screen/splash_screen.dart';
 import 'package:eitansela/routes/route_name.dart';
@@ -17,6 +18,11 @@ import '../feature/home/screen/my_request_screen.dart';
 import '../feature/home/screen/new_req1_screen.dart';
 import '../feature/home/screen/new_request_screen.dart';
 import '../feature/home/screen/professional_screen.dart';
+import '../feature/professional/screen/activejobscreen.dart';
+import '../feature/professional/screen/eraningpage.dart';
+import '../feature/professional/screen/jobrequestpage.dart';
+import '../feature/professional/screen/Onboardingpages/onboardingscreen.dart';
+import '../feature/professional/screen/profilepage.dart';
 import '../feature/profile/screen/profile_screen.dart';
 import '../feature/profile/screen/save_address.dart';
 import '../feature/splash/screen/onboarding_screen2.dart';
@@ -46,6 +52,13 @@ class AppRoute {
     GetPage(name: RouteName.professional, page: () => ProfessionalScreen()),
     GetPage(name: RouteName.chat, page: () => ProfessionalChatScreen()),
 
+    // Sohan
+    GetPage(name: RouteName.homepage, page: () => Homepage()),
+    GetPage(name: RouteName.jobrequest, page: () => JobRequestPage()),
+    GetPage(name: RouteName.earning, page: () => EarningsPage()),
+    GetPage(name: RouteName.profilepage, page: () => ProfilePage()),
+    GetPage(name: RouteName.activejobscreen, page: () => ActiveJobScreen()),
+    GetPage(name: RouteName.onboardingFlow, page: () => Onboarding()),
 
 
 

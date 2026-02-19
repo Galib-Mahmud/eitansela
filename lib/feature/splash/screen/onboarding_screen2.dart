@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class Onboarding2Screen extends StatelessWidget {
-  const Onboarding2Screen({Key? key}) : super(key: key);
+class Onboarding2Screen extends StatefulWidget {
+  const Onboarding2Screen({super.key});
+
+  @override
+  State<Onboarding2Screen> createState() => _Onboarding2ScreenState();
+}
+
+class _Onboarding2ScreenState extends State<Onboarding2Screen> {
+  int _selectedRole = 0; // 0 = Customer, 1 = Professional
 
   @override
   Widget build(BuildContext context) {
@@ -12,133 +19,93 @@ class Onboarding2Screen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: EdgeInsets.only(right: 20.w, top: 10.h),
-                child: TextButton(
-                  onPressed: () {
-                    Get.offAllNamed('/main');
-                  },
-                  child: Text(
-                    'Skip',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: const Color(0xFF666666),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Content
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: Column(
                   children: [
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 20.h),
 
-                    // Illustration
+                    // Yellow circle with hand/phone illustration
                     Container(
 
-                      child: Image.asset(
-                        'assets/images/splash/2.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-
-                    SizedBox(height: 40.h),
-
-                    // Title
-                    Text(
-                      'Welcome to FixNow',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1A1A1A),
-                        height: 1.3,
-                      ),
-                    ),
-
-                    SizedBox(height: 16.h),
-
-                    // Description
-                    Text(
-                      'We make sure your experience is safe, smooth, and\nreliable.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: const Color(0xFF666666),
-                        height: 1.5,
+                      child: Center(
+                        child: Image.asset(
+                          'assets/images/splash/2.png',
+                          width: 220.w,
+                          height: 220.w,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
 
                     SizedBox(height: 30.h),
 
-                    // Features list
-                    _buildFeaturesList(),
+                    // Title
+                    Text(
+                      'Choose your role',
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1A1A1A),
+                      ),
+                    ),
 
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 8.h),
 
-                    // Extra Perks card
-                    _buildExtraPerksCard(),
+                    // Subtitle
+                    Text(
+                      "Tell us how you'll use Handy Connect",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: const Color(0xFF999999),
+                      ),
+                    ),
 
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 24.h),
+
+                    // Role cards
+                    Padding(
+                      padding: EdgeInsets.only(left: 24.w, right: 24.w),
+                      child: Column(
+                        children: [
+                          _buildRoleCard(
+                            index: 0,
+                            title: 'Customer',
+                            subtitle: 'Book trusted home services',
+                          ),
+                          SizedBox(height: 16.h),
+                          _buildRoleCard(
+                            index: 1,
+                            title: 'Professional',
+                            subtitle: 'Offer services & get jobs',
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: 30.h),
                   ],
                 ),
               ),
             ),
 
-            // Page indicators
-            Padding(
-              padding: EdgeInsets.only(bottom: 20.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Inactive indicator
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 4.w),
-                    width: 8.w,
-                    height: 8.h,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE0E0E0),
-                      borderRadius: BorderRadius.circular(4.r),
-                    ),
-                  ),
-                  // Active indicator
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 4.w),
-                    width: 24.w,
-                    height: 8.h,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF00B4A8),
-                      borderRadius: BorderRadius.circular(4.r),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             // Get Started button
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
               child: SizedBox(
                 width: double.infinity,
-                height: 56.h,
+                height: 54.h,
                 child: ElevatedButton(
                   onPressed: () {
                     Get.toNamed('/onboarding3');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00B4A8),
+                    backgroundColor: const Color(0xFFFFC107),
                     foregroundColor: Colors.white,
                     elevation: 0,
+                    shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28.r),
+                      borderRadius: BorderRadius.circular(27.r),
                     ),
                   ),
                   child: Text(
@@ -146,6 +113,7 @@ class Onboarding2Screen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -157,161 +125,96 @@ class Onboarding2Screen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesList() {
-    return Column(
-      children: [
-        _buildFeatureItem(
-          icon: Icons.verified_outlined,
-          iconColor: const Color(0xFF4CAF50),
-          title: 'Verified Professionals',
-          description: 'All service providers are carefully vetted for quality.',
-        ),
-        SizedBox(height: 16.h),
-        _buildFeatureItem(
-          icon: Icons.lock_outline,
-          iconColor: const Color(0xFF9C27B0),
-          title: 'Secure Payments',
-          description: 'Your payments are encrypted and fully protected.',
-        ),
-        SizedBox(height: 16.h),
-        _buildFeatureItem(
-          icon: Icons.star_outline,
-          iconColor: const Color(0xFFFFC107),
-          title: 'Trusted by Users',
-          description: 'Thousands of people rely on our service every day.',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFeatureItem({
-    required IconData icon,
-    required Color iconColor,
+  Widget _buildRoleCard({
+    required int index,
     required String title,
-    required String description,
+    required String subtitle,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 40.w,
-          height: 40.w,
-          decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20.r),
-          ),
-          child: Icon(
-            icon,
-            color: iconColor,
-            size: 24.sp,
-          ),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1A1A1A),
-                ),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: const Color(0xFF666666),
-                  height: 1.4,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+    final bool isSelected = _selectedRole == index;
 
-  Widget _buildExtraPerksCard() {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0FFFE),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: const Color(0xFF00B4A8).withOpacity(0.2),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Extra Perks for You',
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A),
+    return GestureDetector(
+      onTap: () => setState(() => _selectedRole = index),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFFFFF8E1)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFFFFC107)
+                : const Color(0xFFE8E8E8),
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+            BoxShadow(
+              color: const Color(0xFFFFC107).withOpacity(0.3),
+              blurRadius: 10,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
             ),
-          ),
-          SizedBox(height: 12.h),
-          _buildPerkItem(
-            Icons.schedule,
-            'On-time Service',
-            'We respect your schedule.',
-          ),
-          SizedBox(height: 10.h),
-          _buildPerkItem(
-            Icons.support_agent,
-            '24/7 Support',
-            'Help is just a tap away.',
-          ),
-          SizedBox(height: 10.h),
-          _buildPerkItem(
-            Icons.verified,
-            'Satisfaction Guarantee',
-            'Quality service every time.',
-          ),
-        ],
-      ),
-    );
-  }
+          ]
+              : [],
+        ),
+        child: Row(
+          children: [
+            // Text content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF1A1A1A),
+                    ),
+                  ),
+                  SizedBox(height: 3.h),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: const Color(0xFF999999),
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-  Widget _buildPerkItem(IconData icon, String title, String subtitle) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          color: const Color(0xFF00B4A8),
-          size: 20.sp,
-        ),
-        SizedBox(width: 10.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1A1A1A),
+            // Checkmark circle
+            Container(
+              width: 28.w,
+              height: 28.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected
+                    ? const Color(0xFFFFC107)
+                    : Colors.transparent,
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFFFFC107)
+                      : const Color(0xFFD0D0D0),
+                  width: 2,
                 ),
               ),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: const Color(0xFF666666),
+              child: isSelected
+                  ? Center(
+                child: Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 16.sp,
                 ),
-              ),
-            ],
-          ),
+              )
+                  : null,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

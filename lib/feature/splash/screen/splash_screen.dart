@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Navigate to onboarding after delay
     Future.delayed(const Duration(seconds: 3), () {
-      Get.toNamed(RouteName.signin);
+      Get.toNamed(RouteName.onboarding1);
     });
   }
 

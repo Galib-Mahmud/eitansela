@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          initialRoute: RouteName.activejobscreen,
+          initialRoute: RouteName.onboardingFlow,
           getPages: AppRoute.pages,
         );
       },

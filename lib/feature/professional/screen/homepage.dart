@@ -170,7 +170,7 @@ class _HomePageState extends State<Homepage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.work), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.attach_money_sharp), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
         ],
       ),

@@ -26,6 +26,7 @@ class RouteName{
   static const String earning = '/earningpage';
   static const String profilepage = '/profilepage';
   static const String activejobscreen = '/activejobscreen';
+  static const String onboardingFlow = '/onboarding';
 
 
 

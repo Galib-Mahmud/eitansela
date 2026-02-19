@@ -20,16 +20,13 @@ class MyApp extends StatelessWidget {
       designSize: const Size(430, 932),
       minTextAdapt: true,
       splitScreenMode: true,
-      useInheritedMediaQuery: true,  // Add thi
+      useInheritedMediaQuery: true,
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-
-           initialRoute: RouteName.splashScreen,
-
-        
-
+          initialRoute: RouteName.signin,
+          getPages: AppRoute.pages,
         );
       },
     );

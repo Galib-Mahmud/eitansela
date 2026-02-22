@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Onboarding3Screen extends StatefulWidget {
-  const Onboarding3Screen({Key? key}) : super(key: key);
+  const Onboarding3Screen({super.key});
 
   @override
   State<Onboarding3Screen> createState() => _Onboarding3ScreenState();
@@ -30,7 +30,7 @@ class _Onboarding3ScreenState extends State<Onboarding3Screen> {
                     SizedBox(height: 40.h),
 
                     // Illustration
-                    Container(
+                    SizedBox(
                       width: 280.w,
                       height: 280.w,
                       child: Image.asset(

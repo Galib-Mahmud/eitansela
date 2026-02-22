@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'onboardingscreen.dart';
 class Screen3SetupServices extends StatefulWidget {
   final VoidCallback onNext;
-   Screen3SetupServices({super.key, required this.onNext});
+   const Screen3SetupServices({super.key, required this.onNext});
 
   @override
   State<Screen3SetupServices> createState() => _Screen3State();

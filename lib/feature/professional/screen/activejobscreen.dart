@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+
+import '../../../routes/route_name.dart';
 
 // ─── Screen 1: "I'm on My Way" ───────────────────────────────────────────────
 class ActiveJobScreen extends StatelessWidget {
@@ -158,7 +162,8 @@ class ActiveJobScreen4 extends StatelessWidget {
               icon: Icons.check_circle_outline,
               color: const Color(0xFFFFC107),
               onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
+                Get.toNamed(RouteName.main1);
+
               },
             ),
           ],

@@ -1,7 +1,7 @@
-import 'package:eitansela/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../widget/free_non_binding_sheet.dart';
 
 class NewRequestScreen1 extends StatelessWidget {
   const NewRequestScreen1({super.key});
@@ -41,11 +41,7 @@ class NewRequestScreen1 extends StatelessWidget {
               ),
             ),
             SizedBox(height: 12.h),
-            Divider(
-              color: const Color(0xFFEEEEEE),
-              thickness: 1,
-              height: 1,
-            ),
+            const Divider(color: Color(0xFFEEEEEE), thickness: 1, height: 1),
 
             // Content
             Expanded(
@@ -67,18 +63,15 @@ class NewRequestScreen1 extends StatelessWidget {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.08),
                             blurRadius: 10,
-                            offset: Offset(0, 4),
+                            offset: const Offset(0, 4),
                           ),
                         ],
-                        border: Border.all(
-                          color: const Color(0xFFEEEEEE),
-                          width: 1,
-                        ),
+                        border: Border.all(color: const Color(0xFFEEEEEE), width: 1),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Header: yellow check + AI Diagnosis
+                          // Header
                           Row(
                             children: [
                               Container(
@@ -87,17 +80,10 @@ class NewRequestScreen1 extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFFF8E1),
                                   shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(0xFFF8C106),
-                                    width: 2,
-                                  ),
+                                  border: Border.all(color: const Color(0xFFF8C106), width: 2),
                                 ),
                                 child: Center(
-                                  child: Icon(
-                                    Icons.check,
-                                    color: const Color(0xFFF8C106),
-                                    size: 18.sp,
-                                  ),
+                                  child: Icon(Icons.check, color: const Color(0xFFF8C106), size: 18.sp),
                                 ),
                               ),
                               SizedBox(width: 12.w),
@@ -111,7 +97,6 @@ class NewRequestScreen1 extends StatelessWidget {
                               ),
                             ],
                           ),
-
                           SizedBox(height: 18.h),
 
                           // Detected Issue box
@@ -126,8 +111,7 @@ class NewRequestScreen1 extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       'Detected Issue',
@@ -138,14 +122,10 @@ class NewRequestScreen1 extends StatelessWidget {
                                       ),
                                     ),
                                     Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                        vertical: 4.h,
-                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                                       decoration: BoxDecoration(
                                         color: const Color(0xFFFFEBEE),
-                                        borderRadius:
-                                        BorderRadius.circular(6.r),
+                                        borderRadius: BorderRadius.circular(6.r),
                                       ),
                                       child: Text(
                                         'High Severity',
@@ -170,7 +150,6 @@ class NewRequestScreen1 extends StatelessWidget {
                               ],
                             ),
                           ),
-
                           SizedBox(height: 18.h),
 
                           // Suggested Cause
@@ -191,81 +170,54 @@ class NewRequestScreen1 extends StatelessWidget {
                               height: 1.6,
                             ),
                           ),
-
                           SizedBox(height: 20.h),
 
                           // Price + Professional row
                           Row(
                             children: [
-                              // Est. Price
                               Expanded(
                                 child: Container(
                                   padding: EdgeInsets.all(14.w),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(
-                                      color: const Color(0xFFEEEEEE),
-                                      width: 1,
-                                    ),
+                                    border: Border.all(color: const Color(0xFFEEEEEE), width: 1),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Est. Price',
-                                        style: TextStyle(
-                                          fontSize: 12.sp,
-                                          color: const Color(0xFF9E9E9E),
-                                        ),
-                                      ),
+                                      Text('Est. Price',
+                                          style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
                                       SizedBox(height: 6.h),
-                                      Text(
-                                        '₪350 - ₪500',
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w700,
-                                          color: const Color(0xFFF8C106),
-                                        ),
-                                      ),
+                                      Text('₪350 - ₪500',
+                                          style: TextStyle(
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.w700,
+                                              color: const Color(0xFFF8C106))),
                                     ],
                                   ),
                                 ),
                               ),
                               SizedBox(width: 12.w),
-                              // Professional
                               Expanded(
                                 child: Container(
                                   padding: EdgeInsets.all(14.w),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(
-                                      color: const Color(0xFFEEEEEE),
-                                      width: 1,
-                                    ),
+                                    border: Border.all(color: const Color(0xFFEEEEEE), width: 1),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Professional',
-                                        style: TextStyle(
-                                          fontSize: 12.sp,
-                                          color: const Color(0xFF9E9E9E),
-                                        ),
-                                      ),
+                                      Text('Professional',
+                                          style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
                                       SizedBox(height: 6.h),
-                                      Text(
-                                        'Plumber',
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w700,
-                                          color: const Color(0xFF212121),
-                                        ),
-                                      ),
+                                      Text('Plumber',
+                                          style: TextStyle(
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.w700,
+                                              color: const Color(0xFF212121))),
                                     ],
                                   ),
                                 ),
@@ -275,6 +227,7 @@ class NewRequestScreen1 extends StatelessWidget {
                         ],
                       ),
                     ),
+                    SizedBox(height: 32.h),
                   ],
                 ),
               ),
@@ -282,7 +235,7 @@ class NewRequestScreen1 extends StatelessWidget {
 
             // Bottom Buttons
             Padding(
-              padding: EdgeInsets.only(left: 24.h,right: 24.h,bottom: 280.h),
+              padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 28.h),
               child: Row(
                 children: [
                   // Back button
@@ -290,49 +243,42 @@ class NewRequestScreen1 extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () => Get.back(),
                       child: Container(
-                        height: 40.h,
+                        height: 50.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(26.r),
-                          border: Border.all(
-                            color: const Color(0xFFE0E0E0),
-                            width: 1,
-                          ),
+                          border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
                         ),
-                        child: Center(
-                          child: Text(
-                            'Back',
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF212121),
-                            ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Back',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF212121),
                           ),
                         ),
                       ),
                     ),
                   ),
                   SizedBox(width: 12.w),
-                  // Continue button
+                  // Continue button → shows bottom sheet
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
-                        Get.toNamed(RouteName.professional);
-                      },
+                      onTap: FreeNonBindingSheet.show, // ← changed
                       child: Container(
-                        height: 40.h,
+                        height: 50.h,
                         decoration: BoxDecoration(
                           color: const Color(0xFFF8C106),
                           borderRadius: BorderRadius.circular(26.r),
                         ),
-                        child: Center(
-                          child: Text(
-                            'continue',
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Continue',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ),

@@ -20,7 +20,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   final TextEditingController _zipController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  List<XFile> _selectedImages = [];
+  final List<XFile> _selectedImages = [];
   bool _isEmergency = false;
 
   @override

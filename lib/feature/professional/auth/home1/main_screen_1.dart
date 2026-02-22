@@ -1,15 +1,23 @@
-import 'package:eitansela/feature/home/screen/home_screen.dart';
-import 'package:eitansela/feature/home/screen/my_request_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../profile/screen/profile_screen.dart';
+import '../../../customer/profile/views/professional_profile.dart';
+import '../../../customer/screen/home/views/home_screen.dart';
+import '../../../customer/screen/my_request_screen.dart';
+import '../../../customer/profile/views/profile_screen.dart';
+import '../../screen/activejobscreen.dart';
+import '../../screen/home/views/professional_home_screen.dart';
+import '../../screen/homepage.dart';
+import '../../screen/job_request/views/earnings_screen.dart';
+import '../../screen/job_request/views/job_requests_screen.dart';
+import '../../screen/jobrequestpage.dart';
 
 
 
 
 class MainScreen1 extends StatefulWidget {
-  const MainScreen1({Key? key, this.initialIndex = 0}) : super(key: key);
+  const MainScreen1({super.key, this.initialIndex = 0});
 
   final int initialIndex;
 
@@ -27,10 +35,10 @@ class _MainScreen1State extends State<MainScreen1> {
   }
 
   final List<Widget> _pages = [
-    HomeDashboardScreen(),
-    MyRequest(),
-    MyRequest(),
-    ProfileScreen(),
+    ProfessionalHomeScreen(),
+    JobRequestsScreen(),
+    EarningsScreen(),
+    ProfessionalProfileScreen(),
   ];
 
   @override

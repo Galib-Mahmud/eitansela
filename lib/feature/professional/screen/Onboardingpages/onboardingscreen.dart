@@ -5,6 +5,18 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'accrountcreatedonboarding.dart';
 import 'applicationsubmitted.dart';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+
+import '../../../../routes/route_name.dart'; // adjust to your project
+
 class Onboarding extends StatefulWidget {
   const Onboarding({super.key});
 
@@ -13,53 +25,59 @@ class Onboarding extends StatefulWidget {
 }
 
 class _OnboardingState extends State<Onboarding> {
+  final PageController _pageController = PageController();
   int _currentStep = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   void _nextStep() {
     if (_currentStep < 3) {
-      setState(() => _currentStep++);
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  void _prevStep() {
+    if (_currentStep > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+      );
     }
   }
 
   void _goHome() {
-    setState(() => _currentStep = 0);
+    Get.toNamed(RouteName.main1);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 400),
-        transitionBuilder: (child, animation) => SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(1.0, 0),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
-          child: child,
-        ),
-        child: _buildCurrentScreen(),
+      backgroundColor: const Color(0xFFFFFFFF),
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(), // disable manual swipe
+        onPageChanged: (index) => setState(() => _currentStep = index),
+        children: [
+          Screen1AccountCreated(onNext: _nextStep),
+          Screen2VerifyIdentity(onNext: _nextStep),
+          Screen3SetupServices(onNext: _nextStep),
+          Screen4ApplicationSubmitted(onHome: _goHome),
+        ],
       ),
     );
   }
-
-  Widget _buildCurrentScreen() {
-    switch (_currentStep) {
-      case 0:
-        return Screen1AccountCreated(key: const ValueKey(0), onNext: _nextStep);
-      case 1:
-        return Screen2VerifyIdentity(key: const ValueKey(1), onNext: _nextStep);
-      case 2:
-        return Screen3SetupServices(key: const ValueKey(2), onNext: _nextStep);
-      case 3:
-        return Screen4ApplicationSubmitted(key: const ValueKey(3), onHome: _goHome);
-      default:
-        return Screen1AccountCreated(key: const ValueKey(0), onNext: _nextStep);
-    }
-  }
 }
 
-
-// SHARED WIDGETS
+// ───────────────────────────────────────────────────────────────────
+// SHARED CONSTANTS & WIDGETS (unchanged)
+// ───────────────────────────────────────────────────────────────────
 
 const kPrimary = Color(0xFFF5A623);
 const kPrimaryLight = Color(0xFFFFF3DC);
@@ -68,7 +86,7 @@ const kTextGrey = Color(0xFF888888);
 const kBorderGrey = Color(0xFFE0E0E0);
 
 class StepIndicator extends StatelessWidget {
-  final int currentStep; // 0-indexed
+  final int currentStep;
   const StepIndicator({super.key, required this.currentStep});
 
   static const List<String> labels = ['Account', 'Identity', 'Services', 'Review'];
@@ -77,7 +95,6 @@ class StepIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Progress bar
         Row(
           children: List.generate(4, (i) {
             return Expanded(
@@ -93,7 +110,6 @@ class StepIndicator extends StatelessWidget {
           }),
         ),
         SizedBox(height: 12.h),
-        // Step circles + labels
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(4, (i) {
@@ -136,7 +152,6 @@ class StepIndicator extends StatelessWidget {
   }
 }
 
-
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
@@ -159,16 +174,12 @@ class PrimaryButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
       ),
     );
   }
 }
-
 
 class BaseScreen extends StatelessWidget {
   final int step;
@@ -200,5 +211,3 @@ class BaseScreen extends StatelessWidget {
     );
   }
 }
-
-

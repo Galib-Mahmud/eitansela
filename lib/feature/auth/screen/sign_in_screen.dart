@@ -6,155 +6,270 @@ import '../../../routes/route_name.dart';
 import '../../../widget/auth/custom_button.dart';
 import '../../../widget/auth/custom_text_field.dart';
 
-class SignInScreen extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+
+import '../controllers/sign_in_controller.dart';
+
+
+class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
 
   @override
-  _SignInScreenState createState() => _SignInScreenState();
-}
-
-class _SignInScreenState extends State<SignInScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _navigateToSignUp() {
-    Get.toNamed(RouteName.signup);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final c = Get.put(SignInController());
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: screenHeight),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 120.h),
+      backgroundColor: const Color(0xFFF7F5EF),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 60.h),
 
-                // Logo Image
-                Center(
-                  child: Image.asset(
-                    'assets/images/auth/signin.png',
-                  ),
-                ),
+              // ── Logo illustration ──────────────────────────────
+              _buildLogo(),
+              SizedBox(height: 48.h),
 
-                SizedBox(height: 20.h),
-
-                // Welcome Text
-                Text(
-                  "Welcome Back!",
-                  style: TextStyle(
-                    fontFamily: "Inter",
-                    fontSize: 24.sp,
-                    color: const Color(0xFFF8C106),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  "Log in to discover your perfect match",
-                  style: TextStyle(
-                    fontFamily: "Inter",
-                    fontSize: 14.sp,
-                    color: Colors.grey,
-                  ),
-                ),
-
-                SizedBox(height: 30.h),
-
-                // Email TextField
-                CustomTextField(
-                  icon: Icons.email_outlined,
-                  labelText: 'Enter Email Address',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-
-                SizedBox(height: 16.h),
-
-                // Password TextField
-                CustomTextField(
-                  icon: Icons.lock_outline,
-                  labelText: 'Enter Password',
-                  controller: _passwordController,
-                  obscureText: true,
-                ),
-
-                SizedBox(height: 16.h),
-
-                // Forgot Password
-                TextButton(
-                  onPressed: () {
-                    Get.toNamed(RouteName.forgetPass);
-                  },
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14.sp,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: 16.h),
-
-                // Sign In Button
-                CustomButton(
-                  text: 'Sign In',
-                  onPressed: () {
-                    Get.toNamed(RouteName.onboarding2);
-                  },
-                ),
-
-                SizedBox(height: 30.h),
-
-                // Don't have an account? Sign Up
-                Row(
+              // ── Continue with Google ───────────────────────────
+              _buildSocialButton(
+                onTap: c.continueWithGoogle,
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    _GoogleIcon(),
+                    SizedBox(width: 12.w),
                     Text(
-                      "Don't have an account? ",
+                      'Continue with Google',
                       style: TextStyle(
-                        fontFamily: "Inter",
-                        fontSize: 14.sp,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: _navigateToSignUp,
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(
-                          fontFamily: "Inter",
-                          fontSize: 14.sp,
-                          color: const Color(0xFFF8C106),
-                          fontWeight: FontWeight.bold,
-                        ),
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF212121),
                       ),
                     ),
                   ],
                 ),
+              ),
+              SizedBox(height: 14.h),
 
-                SizedBox(height: 30.h),
-              ],
-            ),
+              // ── Continue with Apple ────────────────────────────
+              _buildSocialButton(
+                onTap: c.continueWithApple,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.apple, size: 22.sp, color: Colors.black),
+                    SizedBox(width: 10.w),
+                    Text(
+                      'Continue with Apple',
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF212121),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 24.h),
+
+              // ── Email field ────────────────────────────────────
+              _buildInputField(
+                icon: Icons.mail_outline_rounded,
+                hint: 'Enter Email Address',
+                controller: c.emailController,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              SizedBox(height: 14.h),
+
+              // ── Password field ─────────────────────────────────
+              Obx(() => _buildInputField(
+                icon: Icons.lock_outline_rounded,
+                hint: 'Enter Password',
+                controller: c.passwordController,
+                obscureText: !c.isPasswordVisible.value,
+                suffixIcon: GestureDetector(
+                  onTap: c.togglePasswordVisibility,
+                  child: Icon(
+                    c.isPasswordVisible.value
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    color: const Color(0xFFBDBDBD),
+                    size: 20.sp,
+                  ),
+                ),
+              )),
+              SizedBox(height: 20.h),
+
+              // ── Forgot Password ────────────────────────────────
+              GestureDetector(
+                onTap: c.goToForgotPassword,
+                child: Text(
+                  'Forgot Password?',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: const Color(0xFF9E9E9E),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20.h),
+
+              // ── Sign In button ─────────────────────────────────
+              GestureDetector(
+                onTap: c.signIn,
+                child: Container(
+                  width: double.infinity,
+                  height: 54.h,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8C106),
+                    borderRadius: BorderRadius.circular(30.r),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Sign In',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 28.h),
+
+              // ── Sign Up link ───────────────────────────────────
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account? ",
+                    style: TextStyle(fontSize: 14.sp, color: const Color(0xFF9E9E9E)),
+                  ),
+                  GestureDetector(
+                    onTap: c.goToSignUp,
+                    child: Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFFF8C106),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 40.h),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  // ─────────────────── Logo ──────────────────────────────────────
+  Widget _buildLogo() {
+    return Image.asset(
+      'assets/images/auth/signin.png',
+      width: 120.w,
+      height: 120.w,
+      fit: BoxFit.contain,
+    );
+  }
+
+  // ─────────────────── Social Button ─────────────────────────────
+  Widget _buildSocialButton({required VoidCallback onTap, required Widget child}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 54.h,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: child,
+      ),
+    );
+  }
+
+  // ─────────────────── Input Field ───────────────────────────────
+  Widget _buildInputField({
+    required IconData icon,
+    required String hint,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return Container(
+      height: 54.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            spreadRadius: 0,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        style: TextStyle(fontSize: 14.sp, color: const Color(0xFF212121)),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(fontSize: 14.sp, color: const Color(0xFFBDBDBD)),
+          prefixIcon: Icon(icon, color: const Color(0xFF9E9E9E), size: 20.sp),
+          suffixIcon: suffixIcon,
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30.r),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30.r),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30.r),
+            borderSide: BorderSide(
+              color: const Color(0xFFFFC107),
+              width: 1.5,
+            ),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 16.h),
+        ),
+      ),
+    );
+  }
+
+}
+
+// ─────────────────── Google Icon ───────────────────────────────────
+class _GoogleIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/icons/devicon_google.png',
+      width: 22,
+      height: 22,
+      fit: BoxFit.contain,
     );
   }
 }

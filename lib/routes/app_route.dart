@@ -5,31 +5,26 @@ import 'package:eitansela/feature/splash/screen/onboarding_screen1.dart';
 import 'package:eitansela/feature/splash/screen/splash_screen.dart';
 import 'package:eitansela/routes/route_name.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
-
 import '../feature/auth/screen/password_reset_screen.dart';
 import '../feature/auth/screen/password_reset_sucess_screen.dart';
 import '../feature/auth/screen/sign_up_screen.dart';
-import '../feature/home/main_screen.dart';
-import '../feature/home/screen/analysis_loading_screen.dart';
-import '../feature/home/screen/chat_screen.dart';
-import '../feature/home/screen/close_screen.dart';
-import '../feature/home/screen/confirm_request_screen.dart';
-import '../feature/home/screen/home_screen.dart';
-import '../feature/home/screen/location_screen.dart';
-import '../feature/home/screen/my_request_screen.dart';
-import '../feature/home/screen/my_request_screen.dart';
-
-import '../feature/home/screen/new_req1_screen.dart';
-import '../feature/home/screen/professional_screen.dart';
-import '../feature/home/screen/service_request.dart';
-
-
+import '../feature/customer/main_screen.dart';
+import '../feature/customer/screen/analysis_loading_screen.dart';
+import '../feature/customer/screen/chat_screen.dart';
+import '../feature/customer/screen/close_screen.dart';
+import '../feature/customer/screen/confirm_request_screen.dart';
+import '../feature/customer/screen/home/views/home_screen.dart';
+import '../feature/customer/screen/location_screen.dart';
+import '../feature/customer/screen/my_request_screen.dart';
+import '../feature/customer/screen/order_request/views/new_req1_screen.dart';
+import '../feature/customer/screen/professional_screen.dart';
+import '../feature/customer/screen/service_request.dart';
 import '../feature/professional/screen/Onboardingpages/onboardingscreen.dart';
 import '../feature/professional/screen/activejobscreen.dart';
 import '../feature/professional/screen/eraningpage.dart';
 import '../feature/professional/screen/jobrequestpage.dart';
 import '../feature/professional/screen/profilepage.dart';
-import '../feature/profile/screen/profile_screen.dart';
+import '../feature/customer/profile/views/profile_screen.dart';
 import '../feature/profile/screen/save_address.dart';
 import '../feature/splash/screen/onboarding_screen2.dart';
 import '../feature/splash/screen/onboarding_screen3.dart';
@@ -37,6 +32,8 @@ import '../feature/splash/screen/onboarding_screen3.dart';
 class AppRoute {
   static final List<GetPage> pages = [
     GetPage(name: RouteName.signin, page: () => SignInScreen()),
+    GetPage(name: RouteName.splash, page: () => SplashScreen()),
+
     GetPage(name: RouteName.signup, page: () => SignUpScreen()),
     GetPage(
       name: RouteName.resetPassSucess,

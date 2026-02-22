@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Navigate to onboarding after delay
     Future.delayed(const Duration(seconds: 3), () {
-      Get.toNamed(RouteName.onboarding1);
+      Get.toNamed(RouteName.signin);
     });
   }
 
@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
 
 // Placeholder for OnboardingScreen - replace with your actual onboarding
 class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  const OnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

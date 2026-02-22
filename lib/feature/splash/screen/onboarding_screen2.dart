@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../routes/route_name.dart';
+import '../../professional/screen/Onboardingpages/accrountcreatedonboarding.dart';
+import '../../professional/screen/Onboardingpages/onboardingscreen.dart';
 
 class Onboarding2Screen extends StatefulWidget {
   const Onboarding2Screen({super.key});
@@ -102,7 +104,9 @@ class _Onboarding2ScreenState extends State<Onboarding2Screen> {
                     if (_selectedRole == 0) {
                       Get.toNamed(RouteName.main);
                     } else {
-                      Get.toNamed(RouteName.main1);
+                      Get.to(
+                        const Onboarding(),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(

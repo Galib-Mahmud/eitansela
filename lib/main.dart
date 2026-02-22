@@ -5,10 +5,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'core/color_theme.dart';
+import 'core/splash/controller/splash_controller.dart';
+import 'core/splash/views/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
+  Get.lazyPut(() => SplashController());
+
 }
 
 class MyApp extends StatelessWidget {
@@ -25,8 +29,9 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          initialRoute: RouteName.signin,
+          initialRoute: RouteName.splash,
           getPages: AppRoute.pages,
+          // home: const SplashScreen(),
         );
       },
     );

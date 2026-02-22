@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../notification/views/notifications_screen.dart';
+import '../../../order/views/in_progress_screen.dart';
+import '../../recent_request_screen.dart';
+
 class HomeDashboardScreen extends StatelessWidget {
   const HomeDashboardScreen({super.key});
 
@@ -79,7 +83,11 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
           // Notification Icon
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Get.to(
+                  ()=> const NotificationsScreen(),
+              );
+            },
             child: Icon(
               Icons.notifications_none_rounded,
               color: const Color(0xFF424242),
@@ -145,7 +153,9 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              Get.toNamed(RouteName.recentRequest);
+              Get.to(
+                () => const RecentRequestScreen(),
+              );
             },
             child: Text(
               'See All',
@@ -172,9 +182,7 @@ class HomeDashboardScreen extends StatelessWidget {
             title: 'Kitchen Sink Leak',
             date: 'oct 24 - Complete',
             status: 'IN Process',
-            onTap: () {
-              Get.toNamed(RouteName.myRequest);
-            },
+
           ),
           SizedBox(height: 12.h),
           _buildRecentRequestCard(
@@ -193,19 +201,30 @@ class HomeDashboardScreen extends StatelessWidget {
     required String title,
     required String date,
     required String status,
-    VoidCallback? onTap,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: (){
+        Get.to(
+              () => const InProgressScreen(),
+        );
+      },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
             color: const Color(0xFFE8E8E8),
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              spreadRadius: 0,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [

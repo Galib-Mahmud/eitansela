@@ -65,6 +65,7 @@ flutter:
   assets:
     - assets/images/auth/
     - assets/images/splash/
+    - assets/icons/
     - assets/images/profile/
     - assets/images/professional/
 

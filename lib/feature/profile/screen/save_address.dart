@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class SavedAddressesScreen extends StatelessWidget {
-  const SavedAddressesScreen({Key? key}) : super(key: key);
+  const SavedAddressesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

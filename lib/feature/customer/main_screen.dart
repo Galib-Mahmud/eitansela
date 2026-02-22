@@ -1,13 +1,13 @@
-import 'package:eitansela/feature/home/screen/home_screen.dart';
-import 'package:eitansela/feature/home/screen/my_request_screen.dart';
+import 'package:eitansela/feature/customer/screen/home/views/home_screen.dart';
+import 'package:eitansela/feature/customer/screen/my_request_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../profile/screen/profile_screen.dart';
+import 'profile/views/profile_screen.dart';
 
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key, this.initialIndex = 0}) : super(key: key);
+  const MainScreen({super.key, this.initialIndex = 0});
 
   final int initialIndex;
 

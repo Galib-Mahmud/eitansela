@@ -3,6 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../routes/route_name.dart';
+import '../profile/views/profile_screen.dart';
+import '../order/views/in_progress_screen.dart';
+import '../profile/views/professional_profile_screen.dart';
+import 'my_request_screen.dart';
 
 class ProfessionalScreen extends StatelessWidget {
   const ProfessionalScreen({super.key});
@@ -56,37 +60,33 @@ class ProfessionalScreen extends StatelessWidget {
                   _buildProfessionalCard(
                     name: 'John Mayer',
                     profession: 'Plumber',
-                    priceRange: '₪150-₪350',
+                    priceRange: '5645',
                     imagePath: 'assets/images/profile/profile.png',
-                    onTap: () => Get.toNamed(RouteName.chat),
-                    onDiscussPrice: () => Get.toNamed(RouteName.chat),
+
                   ),
                   SizedBox(height: 14.h),
                   _buildProfessionalCard(
                     name: 'John Mayer',
                     profession: 'Plumber',
-                    priceRange: '₪150-₪350',
+                    priceRange: '6877',
                     imagePath: 'assets/images/profile/profile.png',
-                    onTap: () => Get.toNamed(RouteName.chat),
-                    onDiscussPrice: () => Get.toNamed(RouteName.chat),
+
                   ),
                   SizedBox(height: 14.h),
                   _buildProfessionalCard(
                     name: 'John Mayer',
                     profession: 'Plumber',
-                    priceRange: '₪150-₪350',
+                    priceRange: '5647',
                     imagePath: 'assets/images/profile/profile.png',
-                    onTap: () => Get.toNamed(RouteName.chat),
-                    onDiscussPrice: () => Get.toNamed(RouteName.chat),
+
                   ),
                   SizedBox(height: 14.h),
                   _buildProfessionalCard(
                     name: 'John Mayer',
                     profession: 'Plumber',
-                    priceRange: '₪150-₪350',
+                    priceRange: '5784',
                     imagePath: 'assets/images/profile/profile.png',
-                    onTap: () => Get.toNamed(RouteName.chat),
-                    onDiscussPrice: () => Get.toNamed(RouteName.chat),
+
                   ),
                 ],
               ),
@@ -102,8 +102,7 @@ class ProfessionalScreen extends StatelessWidget {
     required String profession,
     required String priceRange,
     required String imagePath,
-    required VoidCallback onTap,
-    required VoidCallback onDiscussPrice,
+
   }) {
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -166,89 +165,100 @@ class ProfessionalScreen extends StatelessWidget {
           SizedBox(height: 14.h),
 
           // Row 2: Avatar + Name + Profession + Arrow
-          Row(
-            children: [
-              // Profile image with green online dot
-              SizedBox(
-                width: 48.w,
-                height: 48.w,
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 48.w,
-                      height: 48.w,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage(imagePath),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    // Green online dot
-                    Positioned(
-                      bottom: 2,
-                      left: 2,
-                      child: Container(
-                        width: 12.w,
-                        height: 12.w,
+          GestureDetector(
+            onTap: (){
+              Get.to(
+                () => const ProfessionalProfileScreen(),
+              );
+            },
+            child: Row(
+              children: [
+                // Profile image with green online dot
+                SizedBox(
+                  width: 48.w,
+                  height: 48.w,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 48.w,
+                        height: 48.w,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 12.w),
-              // Name + Profession
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF212121),
-                      ),
-                    ),
-                    SizedBox(height: 3.h),
-                    Row(
-                      children: [
-                        // Water drop icon
-                        Image.asset(
-                          'assets/images/profile/water.png',
-                          width: 14.w,
-                          height: 14.w,
-                          fit: BoxFit.contain,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          profession,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            color: const Color(0xFF9E9E9E),
+                          image: DecorationImage(
+                            image: AssetImage(imagePath),
+                            fit: BoxFit.cover,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      // Green online dot
+                      Positioned(
+                        bottom: 2,
+                        left: 2,
+                        child: Container(
+                          width: 12.w,
+                          height: 12.w,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4CAF50),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // Yellow arrow
-              GestureDetector(
-                onTap: onTap,
-                child: Icon(
-                  Icons.chevron_right,
-                  color: const Color(0xFFF8C106),
-                  size: 28.sp,
+                SizedBox(width: 12.w),
+                // Name + Profession
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF212121),
+                        ),
+                      ),
+                      SizedBox(height: 3.h),
+                      Row(
+                        children: [
+                          // Water drop icon
+                          Image.asset(
+                            'assets/images/profile/water.png',
+                            width: 14.w,
+                            height: 14.w,
+                            fit: BoxFit.contain,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            profession,
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: const Color(0xFF9E9E9E),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                // Yellow arrow
+                GestureDetector(
+                  onTap: (){
+                    Get.to(
+                      () => const ProfessionalProfileScreen(),
+                    );
+                  },
+                  child: Icon(
+                    Icons.chevron_right,
+                    color: const Color(0xFFF8C106),
+                    size: 28.sp,
+                  ),
+                ),
+              ],
+            ),
           ),
 
           SizedBox(height: 14.h),
@@ -271,7 +281,7 @@ class ProfessionalScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Price Range',
+                      'Zip Code',
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: const Color(0xFF9E9E9E),
@@ -291,7 +301,11 @@ class ProfessionalScreen extends StatelessWidget {
               ),
               // Discuss Pricing button
               GestureDetector(
-                onTap: onDiscussPrice,
+                onTap:(){
+                  Get.to(
+                        () => const InProgressScreen(),
+                  );
+                },
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 18.w,
@@ -299,10 +313,10 @@ class ProfessionalScreen extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8C106),
-                    borderRadius: BorderRadius.circular(22.r),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    'Discuss Pricing',
+                    'Send Request',
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,

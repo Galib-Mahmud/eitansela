@@ -109,7 +109,7 @@ class _HomePageState extends State<Homepage> {
                                 onChanged: (v) {
                                   setState(() => isOnline = v);
                                 },
-                                activeColor: Colors.green,
+                                activeThumbColor: Colors.green,
                               ),
                             ],
                           ),
@@ -144,21 +144,21 @@ class _HomePageState extends State<Homepage> {
 
             /// ACTIVE JOBS
             titleRow("Active Jobs"),
-            jobCard("Michael Ben", "otc24,2023", "\ on the way"),
+            jobCard("Michael Ben", "otc24,2023", " on the way"),
 
             const SizedBox(height: 12),
 
             /// EMERGENCY REQUEST
             titleRow("Emergency Request"),
-            jobCard("Plumbing", "otc24,2023", "\ new",),
-            jobCard("Plumbing", "otc24,2023", "\ new",),
+            jobCard("Plumbing", "otc24,2023", " new",),
+            jobCard("Plumbing", "otc24,2023", " new",),
 
             const SizedBox(height: 12),
 
             /// NEW REQUEST
             titleRow("New Requests"),
-            jobCard("Electrical", "Today", "\ new"),
-            jobCard("Electrical", "Today", "\ new"),
+            jobCard("Electrical", "Today", " new"),
+            jobCard("Electrical", "Today", " new"),
           ],
         ),
       ),

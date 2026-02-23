@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../customer/profile/views/professional_profile.dart';
+import '../../profile/views/professional_profile.dart';
 import '../../../customer/screen/home/views/home_screen.dart';
 import '../../../customer/screen/my_request_screen.dart';
 import '../../../customer/profile/views/profile_screen.dart';

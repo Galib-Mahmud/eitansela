@@ -1,5 +1,8 @@
 import 'package:get/get.dart';
 
+
+enum JobStatus { pending, completed, inProcess }
+
 class JobRequestModel {
   final String clientName;
   final String clientImage;
@@ -9,6 +12,7 @@ class JobRequestModel {
   final String address;
   final String distance;
   final String zipCode;
+  final JobStatus status;
 
   const JobRequestModel({
     required this.clientName,
@@ -19,8 +23,13 @@ class JobRequestModel {
     required this.address,
     required this.distance,
     required this.zipCode,
+    this.status = JobStatus.pending,
   });
 }
+
+// ═══════════════════════════════════════════════════════════════════
+//  Controller
+// ═══════════════════════════════════════════════════════════════════
 
 class JobRequestsController extends GetxController {
   final requests = <JobRequestModel>[
@@ -33,6 +42,7 @@ class JobRequestsController extends GetxController {
       address: '15 Herzl St, Tel Aviv',
       distance: '2.3 km',
       zipCode: '1234',
+      status: JobStatus.pending,
     ),
     const JobRequestModel(
       clientName: 'David Cohen',
@@ -43,6 +53,7 @@ class JobRequestsController extends GetxController {
       address: '15 Herzl St, Tel Aviv',
       distance: '2.3 km',
       zipCode: '1234',
+      status: JobStatus.pending,
     ),
     const JobRequestModel(
       clientName: 'David Cohen',
@@ -53,6 +64,29 @@ class JobRequestsController extends GetxController {
       address: '15 Herzl St, Tel Aviv',
       distance: '2.3 km',
       zipCode: '1234',
+      status: JobStatus.pending,
+    ),
+    const JobRequestModel(
+      clientName: 'David Cohen',
+      clientImage: 'assets/images/profile/profile.png',
+      timeAgo: '4h ago',
+      issueTitle: 'Leaking pipe under kitchen sink',
+      aiDiagnosis: 'Worn seal or small crack in pipe',
+      address: '15 Herzl St, Tel Aviv',
+      distance: '2.3 km',
+      zipCode: '1234',
+      status: JobStatus.completed,
+    ),
+    const JobRequestModel(
+      clientName: 'David Cohen',
+      clientImage: 'assets/images/profile/profile.png',
+      timeAgo: '4h ago',
+      issueTitle: 'Leaking pipe under kitchen sink',
+      aiDiagnosis: 'Worn seal or small crack in pipe',
+      address: '15 Herzl St, Tel Aviv',
+      distance: '2.3 km',
+      zipCode: '1234',
+      status: JobStatus.inProcess,
     ),
   ].obs;
 

@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import '../controllers/recent_reviews_controller.dart';
 
 
-class RecentReviewsScreen extends StatelessWidget {
-  const RecentReviewsScreen({super.key});
+class ReviewsScreen extends StatelessWidget {
+  const ReviewsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

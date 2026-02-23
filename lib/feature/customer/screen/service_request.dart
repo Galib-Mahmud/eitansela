@@ -22,6 +22,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   final ImagePicker _picker = ImagePicker();
   final List<XFile> _selectedImages = [];
   bool _isEmergency = false;
+  bool _canCall = false;
 
   @override
   void dispose() {
@@ -132,13 +133,12 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                     SizedBox(height: 20.h),
 
                     // Emergency Service
-                    _buildEmergencyCard(),
-
+                    buildNoCallCard(),
+                    SizedBox(height: 20.h),
+                    _buildNoCallCard(),
                     SizedBox(height: 24.h),
-
                     // Continue button
                     _buildContinueButton(),
-
                     SizedBox(height: 30.h),
                   ],
                 ),
@@ -313,8 +313,88 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     );
   }
 
+
+  Widget buildNoCallCard() {
+    return GestureDetector(
+      onTap: () => setState(() => _canCall = !_canCall),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(14.w),
+        decoration: BoxDecoration(
+          color:  Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: const Color(0xFFBDBDBD),
+            width: 1,
+          ),
+
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Checkbox
+            Container(
+              width: 22.w,
+              height: 22.w,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4.r),
+                border: Border.all(
+                  color: _canCall
+                      ? const Color(0xFFF8C106)
+                      : const Color(0xFFBDBDBD),
+                  width: 2,
+                ),
+                color: _canCall ? const Color(0xFFF8C106) : Colors.white,
+              ),
+              child: _canCall
+                  ? Icon(Icons.check, color: Colors.white, size: 14.sp)
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+            // Text
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF212121),
+                      ),
+                      children: [
+                        const TextSpan(text: 'Mark as Emergency Service '),
+                        TextSpan(
+                          text: '(+€30)',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF4CAF50),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    'Get priority placement and faster response times from providers',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: const Color(0xFF757575),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ───────────────────── Emergency Card ──────────────────────────────
-  Widget _buildEmergencyCard() {
+  Widget _buildNoCallCard() {
     return GestureDetector(
       onTap: () => setState(() => _isEmergency = !_isEmergency),
       child: Container(

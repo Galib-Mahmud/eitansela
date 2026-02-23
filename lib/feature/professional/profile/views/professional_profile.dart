@@ -8,54 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../controllers/professional_profile_controller.dart';
+import '../controllers/select_categories_controller.dart';
+
 // ─── Controller ────────────────────────────────────────────────────────────────
-class ProfessionalProfileController extends GetxController {
-  var userName = 'Michael Ben'.obs;
-  var userEmail = 'michealben@gmail.com'.obs;
-  var userPhone = '+1 234 567 890'.obs;
-  var userImage = 'assets/images/profile.png'.obs;
-
-  // Stats
-  var emergencyCount = 4.obs;
-  var jobsCount = 342.obs;
-  var rating = 4.8.obs;
-
-  // Delete account
-  var isDeleteChecked = false.obs;
-
-  void toggleDeleteCheck(bool value) => isDeleteChecked.value = value;
-
-  void confirmDeleteAccount() {
-    Get.back();
-    // TODO: call your delete account API here
-  }
-
-  void showDeleteAccountDialog(BuildContext context) {
-    isDeleteChecked.value = false; // reset checkbox each time dialog opens
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => _DeleteAccountDialog(controller: this),
-    );
-  }
-
-  void showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Log Out', style: TextStyle(color: Color(0xFFE53935))),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ─── Screen ─────────────────────────────────────────────────────────────────────
 class ProfessionalProfileScreen extends StatelessWidget {
@@ -63,7 +19,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = Get.put(ProfessionalProfileController());
+    final c = Get.put(ProfessionalProfileScreenController());
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
@@ -98,7 +54,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 12.h),
-                    _buildCategoriesCard(),
+                    _buildCategoriesCard(context),
                     SizedBox(height: 24.h),
 
                     // ── Recent Reviews ────────────────────────────
@@ -113,12 +69,19 @@ class ProfessionalProfileScreen extends StatelessWidget {
                             color: const Color(0xFF212121),
                           ),
                         ),
-                        Text(
-                          'View All',
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF2563EB),
+                        GestureDetector(
+                          onTap: (){
+                            Get.to(
+                              () => const ReviewsScreen(),
+                            );
+                          },
+                          child: Text(
+                            'View All',
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF2563EB),
+                            ),
                           ),
                         ),
                       ],
@@ -202,7 +165,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
   }
 
   // ─────────────────────── Header ────────────────────────────────
-  Widget _buildHeader(BuildContext context, ProfessionalProfileController c) {
+  Widget _buildHeader(BuildContext context, ProfessionalProfileScreenController c) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
       child: Row(
@@ -226,7 +189,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
   }
 
   // ─────────────────────── Profile Card ──────────────────────────
-  Widget _buildProfileCard(ProfessionalProfileController c) {
+  Widget _buildProfileCard(ProfessionalProfileScreenController c) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -281,7 +244,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
   }
 
   // ─────────────────────── Stats Row ─────────────────────────────
-  Widget _buildStatsRow(ProfessionalProfileController c) {
+  Widget _buildStatsRow(ProfessionalProfileScreenController c) {
     return Obx(() => Row(
       children: [
         _buildStatCard(
@@ -356,7 +319,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
   }
 
   // ─────────────────────── Categories Card ───────────────────────
-  Widget _buildCategoriesCard() {
+  Widget _buildCategoriesCard(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -372,6 +335,9 @@ class ProfessionalProfileScreen extends StatelessWidget {
             title: 'Personal Info',
             trailing: Icon(Icons.arrow_forward_ios, size: 14.sp, color: const Color(0xFF9E9E9E)),
             showDivider: true,
+              onTap: (){
+
+              }
           ),
           _buildCategoryItem(
             icon: Icons.shield_outlined,
@@ -392,6 +358,9 @@ class ProfessionalProfileScreen extends StatelessWidget {
               ),
             ),
             showDivider: true,
+              onTap: (){
+
+              }
           ),
           _buildCategoryItem(
             icon: Icons.description_outlined,
@@ -422,18 +391,26 @@ class ProfessionalProfileScreen extends StatelessWidget {
               ],
             ),
             showDivider: true,
+              onTap: (){
+
+              }
           ),
           _buildCategoryItem(
             icon: Icons.location_on_outlined,
             title: 'Service Areas',
             trailing: Icon(Icons.arrow_forward_ios, size: 14.sp, color: const Color(0xFF9E9E9E)),
             showDivider: true,
+            onTap: (){
+
+            }
           ),
           _buildCategoryItem(
             icon: Icons.add_location_outlined,
             title: 'Add Services',
             trailing: Icon(Icons.arrow_forward_ios, size: 14.sp, color: const Color(0xFF9E9E9E)),
             showDivider: false,
+            onTap: () => SelectCategoriesController.show(context),
+
           ),
         ],
       ),
@@ -445,38 +422,42 @@ class ProfessionalProfileScreen extends StatelessWidget {
     required String title,
     required Widget trailing,
     required bool showDivider,
+    required VoidCallback? onTap,
   }) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-          child: Row(
-            children: [
-              Icon(icon, size: 22.sp, color: const Color(0xFF424242)),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF212121),
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            child: Row(
+              children: [
+                Icon(icon, size: 22.sp, color: const Color(0xFF424242)),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF212121),
+                    ),
                   ),
                 ),
-              ),
-              trailing,
-            ],
+                trailing,
+              ],
+            ),
           ),
-        ),
-        if (showDivider)
-          Divider(
-            height: 1,
-            thickness: 1,
-            indent: 16.w,
-            endIndent: 16.w,
-            color: const Color(0xFFEEEEEE),
-          ),
-      ],
+          if (showDivider)
+            Divider(
+              height: 1,
+              thickness: 1,
+              indent: 16.w,
+              endIndent: 16.w,
+              color: const Color(0xFFEEEEEE),
+            ),
+        ],
+      ),
     );
   }
 
@@ -559,7 +540,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
 
 // ─────────────── Delete Account Dialog Widget ──────────────────────
 class _DeleteAccountDialog extends StatelessWidget {
-  final ProfessionalProfileController controller;
+  final ProfessionalProfileScreenController controller;
 
   const _DeleteAccountDialog({required this.controller});
 

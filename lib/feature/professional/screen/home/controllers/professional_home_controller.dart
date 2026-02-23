@@ -21,6 +21,7 @@ class JobRequestModel {
   final String total;
   final String distance;
   final String iconPath;
+  final bool isSold;
 
   const JobRequestModel({
     required this.service,
@@ -28,6 +29,7 @@ class JobRequestModel {
     required this.total,
     required this.distance,
     required this.iconPath,
+    this.isSold = false,
   });
 }
 
@@ -74,6 +76,14 @@ class ProfessionalHomeController extends GetxController {
       total: '₪450',
       distance: '2.3 km',
       iconPath: 'assets/images/profile/water.png',
+    ),
+    const JobRequestModel(
+      service: 'Plumbing',
+      date: 'Oct 24, 2023',
+      total: '₪450',
+      distance: '2.3 km',
+      iconPath: 'assets/images/profile/water.png',
+      isSold: true
     ),
   ].obs;
 

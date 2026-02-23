@@ -2,7 +2,8 @@ import 'package:eitansela/feature/customer/notification/views/notifications_scre
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
+import '../../../../customer/screen/home/controllers/report_issue_controller.dart';
+import '../../activejobscreen.dart';
 import '../controllers/professional_home_controller.dart';
 
 class ProfessionalHomeScreen extends StatelessWidget {
@@ -33,7 +34,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
               SizedBox(height: 10.h),
               Obx(() => Column(
                 children: c.activeJobs
-                    .map((job) => _buildActiveJobCard(job))
+                    .map((job) => _buildActiveJobCard(job,context))
                     .toList(),
               )),
               SizedBox(height: 20.h),
@@ -324,7 +325,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
   }
 
   // ─────────────────── Active Job Card ───────────────────────────
-  Widget _buildActiveJobCard(ActiveJobModel job) {
+  Widget _buildActiveJobCard(ActiveJobModel job, BuildContext context) {
     return Container(
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
@@ -343,28 +344,43 @@ class ProfessionalHomeScreen extends StatelessWidget {
               color: const Color(0xFFFFF8E1),
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(Icons.ac_unit, color: const Color(0xFF90CAF9), size: 24.sp),
+            child: GestureDetector(
+                onTap: (){
+                  Get.to(
+                          () => const ActiveJobScreen());
+                },
+                child: Icon(Icons.ac_unit, color: const Color(0xFF90CAF9), size: 24.sp)),
           ),
           SizedBox(width: 14.w),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(job.clientName,
-                    style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF212121))),
-                SizedBox(height: 4.h),
-                Text(job.address,
-                    style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
-              ],
+            child: GestureDetector(
+              onTap: (){
+                Get.to(
+                  () => const ActiveJobScreen());
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(job.clientName,
+                      style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF212121))),
+                  SizedBox(height: 4.h),
+                  Text(job.address,
+                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
+                ],
+              ),
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Icon(Icons.flag_outlined, color: const Color(0xFF9E9E9E), size: 18.sp),
+            children:[
+              GestureDetector(
+                  onTap: () => ReportIssueController.show(context, jobType: 'Plumbing'),
+
+                  child: Icon(Icons.flag_outlined, color: const Color(0xFF9E9E9E), size: 18.sp)
+              ),
               SizedBox(height: 6.h),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
@@ -389,105 +405,162 @@ class ProfessionalHomeScreen extends StatelessWidget {
   }
 
   // ─────────────────── Job Request Card ──────────────────────────
+
   Widget _buildJobRequestCard(JobRequestModel request) {
-    return Container(
-      padding: EdgeInsets.all(14.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Image.asset(
-                request.iconPath,
-                width: 40.w,
-                height: 40.w,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) =>
-                    Icon(Icons.water_drop, color: const Color(0xFF64B5F6), size: 36.sp),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(request.service,
-                        style: TextStyle(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF212121))),
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [
-                        Icon(Icons.calendar_today_outlined,
-                            size: 12.sp, color: const Color(0xFF9E9E9E)),
-                        SizedBox(width: 4.w),
-                        Text(request.date,
-                            style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text('New',
-                    style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF43A047))),
-              ),
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.all(14.w),
+          decoration: BoxDecoration(
+            color: request.isSold ? const Color(0xFFF5F5F5) : Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
             ],
           ),
-          SizedBox(height: 12.h),
-          const Divider(height: 1, color: Color(0xFFF5F5F5)),
-          SizedBox(height: 12.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  Text('Total',
-                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
-                  SizedBox(height: 4.h),
-                  Text(request.total,
+                  Image.asset(
+                    request.iconPath,
+                    width: 40.w,
+                    height: 40.w,
+                    fit: BoxFit.contain,
+                    // color: request.isSold ? const Color(0xFFBDBDBD) : null,
+                    colorBlendMode: request.isSold ? BlendMode.saturation : null,
+                    errorBuilder: (_, __, ___) =>
+                        Icon(Icons.water_drop, color: const Color(0xFF64B5F6), size: 36.sp),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          request.service,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w700,
+                            color: request.isSold
+                                ? const Color(0xFF9E9E9E)
+                                : const Color(0xFF212121),
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today_outlined,
+                                size: 12.sp, color: const Color(0xFF9E9E9E)),
+                            SizedBox(width: 4.w),
+                            Text(request.date,
+                                style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      'New',
                       style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFFF8C106))),
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF43A047),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              SizedBox(height: 12.h),
+              const Divider(height: 1, color: Color(0xFFF5F5F5)),
+              SizedBox(height: 12.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Distance',
-                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
-                  SizedBox(height: 4.h),
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.location_on_outlined,
-                          size: 14.sp, color: const Color(0xFF9E9E9E)),
-                      SizedBox(width: 2.w),
-                      Text(request.distance,
-                          style: TextStyle(fontSize: 14.sp, color: const Color(0xFF424242))),
+                      Text('Total',
+                          style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
+                      SizedBox(height: 4.h),
+                      Text(
+                        request.total,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w700,
+                          color: request.isSold
+                              ? const Color(0xFF9E9E9E)
+                              : const Color(0xFFF8C106),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('Distance',
+                          style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on_outlined,
+                              size: 14.sp, color: const Color(0xFF9E9E9E)),
+                          SizedBox(width: 2.w),
+                          Text(request.distance,
+                              style: TextStyle(fontSize: 14.sp, color: const Color(0xFF424242))),
+                        ],
+                      ),
                     ],
                   ),
                 ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+
+        // ── "Lead Already Sold" overlay badge ─────────────────────
+        if (request.isSold)
+          Positioned.fill(
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF474747),
+                  borderRadius: BorderRadius.circular(30.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.white, size: 16.sp),
+                    SizedBox(width: 8.w),
+                    Text(
+                      'Lead Already Sold',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
+
 }

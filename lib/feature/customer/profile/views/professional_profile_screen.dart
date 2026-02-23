@@ -405,7 +405,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
             Text('Recent Reviews',
                 style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700, color: const Color(0xFF212121))),
             GestureDetector(
-              onTap: () => Get.to(() => const RecentReviewsScreen()),
+              onTap: () => Get.to(() => const ReviewsScreen()),
               child: Text('View All',
                   style: TextStyle(fontSize: 13.sp, color: const Color(0xFF9E9E9E))),
             ),

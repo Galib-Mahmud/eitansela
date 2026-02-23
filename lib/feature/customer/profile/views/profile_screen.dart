@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../controllers/profile_controller.dart';
+import '../widgets/need_help_dialog.dart';
 
                 // adjust to your project
 
@@ -60,12 +61,12 @@ class ProfileScreen extends StatelessWidget {
                       onTap: () {},
                     ),
                     SizedBox(height: 12.h),
-                    _buildMenuItem(
-                      icon: Icons.language_outlined,
-                      title: 'Language',
-                      subtitle: 'English',
-                      onTap: () {},
-                    ),
+                    // _buildMenuItem(
+                    //   icon: Icons.language_outlined,
+                    //   title: 'Language',
+                    //   subtitle: 'English',
+                    //   onTap: () {},
+                    // ),
                     SizedBox(height: 32.h),
 
                     // ── Delete Account Button ─────────────────────
@@ -143,11 +144,14 @@ class ProfileScreen extends StatelessWidget {
             'Profile',
             style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700, color: const Color(0xFF212121)),
           ),
-          Container(
-            width: 34.w,
-            height: 34.w,
-            decoration: const BoxDecoration(color: Color(0xFF212121), shape: BoxShape.circle),
-            child: Icon(Icons.question_mark_rounded, color: Colors.white, size: 16.sp),
+          GestureDetector(
+            onTap: ()=> NeedHelpDialog.show(context),
+            child: Container(
+              width: 34.w,
+              height: 34.w,
+              decoration: const BoxDecoration(color: Color(0xFF212121), shape: BoxShape.circle),
+              child: Icon(Icons.question_mark_rounded, color: Colors.white, size: 16.sp),
+            ),
           ),
         ],
       ),

@@ -5,7 +5,6 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../../routes/route_name.dart';
 
-// ─── Screen 1: "I'm on My Way" ───────────────────────────────────────────────
 class ActiveJobScreen extends StatelessWidget {
   const ActiveJobScreen({super.key});
 

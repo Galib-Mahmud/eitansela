@@ -5,14 +5,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'core/color_theme.dart';
+import 'core/endpoint/api_client.dart';
+import 'core/local_storage/user_info.dart';
 import 'core/splash/controller/splash_controller.dart';
-import 'core/splash/views/splash_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await UserInfo.init();
   runApp(const MyApp());
   Get.lazyPut(() => SplashController());
-
 }
 
 class MyApp extends StatelessWidget {
@@ -31,7 +32,6 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           initialRoute: RouteName.splash,
           getPages: AppRoute.pages,
-          // home: const SplashScreen(),
         );
       },
     );

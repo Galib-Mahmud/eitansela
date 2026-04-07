@@ -17,7 +17,7 @@ class SplashController extends GetxController {
   void _startTimer() {
     Timer(const Duration(seconds: 3), () {
 
-      Get.offAll(() => const SignInScreen());
+      // Get.offAll(() => const SignInScreen());
 
       // String? accessToken = StorageService.accessToken;
       //

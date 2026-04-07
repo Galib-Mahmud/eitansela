@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType? keyboardType;
   final IconData? icon;
+  final Widget? suffixIcon;
 
   const CustomTextField({
     super.key,
@@ -15,6 +16,7 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     this.keyboardType,
     this.icon,
+    this.suffixIcon,
   });
 
   @override
@@ -58,6 +60,11 @@ class CustomTextField extends StatelessWidget {
                 ),
               ),
             ),
+            // 👇 THIS IS YOUR FIX
+            if (suffixIcon != null) ...[
+              SizedBox(width: 6.w),
+              suffixIcon!,
+            ],
           ],
         ),
       ),

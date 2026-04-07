@@ -1,64 +1,20 @@
-import 'package:eitansela/routes/route_name.dart';
+// lib/feature/auth/screens/password_reset_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../controllers/auth_controller.dart';
 import '../../../widget/auth/custom_back_button.dart';
 import '../../../widget/auth/custom_button.dart';
 import '../../../widget/auth/custom_text_field.dart';
 
-class PasswordResetScreen extends StatefulWidget {
+class PasswordResetScreen extends StatelessWidget {
   const PasswordResetScreen({super.key});
 
   @override
-  _PasswordResetScreenState createState() => _PasswordResetScreenState();
-}
-
-class _PasswordResetScreenState extends State<PasswordResetScreen> {
-  final _newPasswordController = TextEditingController();
-  final _reEnterPasswordController = TextEditingController();
-
-  @override
-  void dispose() {
-    _newPasswordController.dispose();
-    _reEnterPasswordController.dispose();
-    super.dispose();
-  }
-
-  void _updatePassword() {
-    if (_newPasswordController.text.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please enter your new password',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
-    if (_newPasswordController.text != _reEnterPasswordController.text) {
-      Get.snackbar(
-        'Error',
-        'Passwords do not match',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
-    if (_newPasswordController.text.length < 6) {
-      Get.snackbar(
-        'Error',
-        'Password must be at least 6 characters',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
-    print('Password updated successfully');
-    // Get.toNamed(RouteName.passwordResetSuccess);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final c = AuthController.to;
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -73,28 +29,23 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
               children: [
                 SizedBox(height: 50.h),
 
-                // Back button
                 CustomBackButton(),
 
                 SizedBox(height: 16.h),
 
-                // Logo Image
                 Center(
-                  child: Image.asset(
-                    'assets/images/auth/signin.png',
-                  ),
+                  child: Image.asset('assets/images/auth/signin.png'),
                 ),
 
                 SizedBox(height: 20.h),
 
-                // Password reset Text
                 Center(
                   child: Text(
                     "Password reset",
                     style: TextStyle(
                       fontFamily: "Inter",
                       fontSize: 24.sp,
-                      color: Color(0xFFF8C106),
+                      color: const Color(0xFFF8C106),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -102,33 +53,33 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
 
                 SizedBox(height: 30.h),
 
-                // New Password TextField
+                // New Password
                 CustomTextField(
                   icon: Icons.lock_outline,
                   labelText: 'Enter your new password',
-                  controller: _newPasswordController,
+                  controller: c.newPasswordController,
                   obscureText: true,
                 ),
 
                 SizedBox(height: 16.h),
 
-                // Re-Enter New Password TextField
+                // Re-Enter New Password
                 CustomTextField(
                   icon: Icons.lock_outline,
-                  labelText: 'Re- Enter new password',
-                  controller: _reEnterPasswordController,
+                  labelText: 'Re-Enter new password',
+                  controller: c.reNewPasswordController,
                   obscureText: true,
                 ),
 
                 SizedBox(height: 30.h),
 
-                // Update Password Button
-                CustomButton(
-                  text: 'Update Password',
-                  onPressed: () {
-                    Get.toNamed(RouteName.resetPassSucess);
-                  },
-                ),
+                Obx(() => CustomButton(
+                  text: c.isLoading.value
+                      ? 'Updating...'
+                      : 'Update Password',
+                  onPressed:
+                  c.isLoading.value ? null : c.resetPassword,
+                )),
 
                 SizedBox(height: 30.h),
               ],

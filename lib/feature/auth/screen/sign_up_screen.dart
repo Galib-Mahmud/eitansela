@@ -1,58 +1,20 @@
-import 'package:eitansela/routes/route_name.dart';
+// lib/feature/auth/screens/sign_up_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:get/get.dart';
 
+import '../controllers/auth_controller.dart';
 import '../../../widget/auth/custom_back_button.dart';
 import '../../../widget/auth/custom_button.dart';
 import '../../../widget/auth/custom_text_field.dart';
 
-class SignUpScreen extends StatefulWidget {
+class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
 
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
-}
-
-class _SignUpScreenState extends State<SignUpScreen> {
-  final _fullNameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _mobileController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _reEnterPasswordController = TextEditingController();
-
-  @override
-  void dispose() {
-    _fullNameController.dispose();
-    _emailController.dispose();
-    _mobileController.dispose();
-    _passwordController.dispose();
-    _reEnterPasswordController.dispose();
-    super.dispose();
-  }
-
-  void _signUp() {
-    // Validate passwords match
-    if (_passwordController.text != _reEnterPasswordController.text) {
-      Get.snackbar(
-        'Error',
-        'Passwords do not match',
-
-      );
-      return;
-    }
-    print('Sign Up attempted with email: ${_emailController.text}');
-    // Get.toNamed(RouteName.homeScreen);
-  }
-
-  void _navigateToLogin() {
-    print('Navigate to Login screen');
-    // Get.toNamed(RouteName.signIn);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final c = AuthController.to;
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -85,7 +47,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 CustomTextField(
                   icon: Icons.person_outline,
                   labelText: 'Enter Full Name',
-                  controller: _fullNameController,
+                  controller: c.fullNameController,
                   keyboardType: TextInputType.name,
                 ),
 
@@ -95,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 CustomTextField(
                   icon: Icons.email_outlined,
                   labelText: 'Enter Email Address',
-                  controller: _emailController,
+                  controller: c.signUpEmailController,
                   keyboardType: TextInputType.emailAddress,
                 ),
 
@@ -105,39 +67,95 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 CustomTextField(
                   icon: Icons.phone_outlined,
                   labelText: 'Enter Mobile Number',
-                  controller: _mobileController,
+                  controller: c.phoneController,
                   keyboardType: TextInputType.phone,
                 ),
 
                 SizedBox(height: 16.h),
 
                 // Password TextField
-                CustomTextField(
+                // Password Field
+                Obx(() => CustomTextField(
                   icon: Icons.lock_outline,
                   labelText: 'Enter Password',
-                  controller: _passwordController,
-                  obscureText: true,
-                ),
+                  controller: c.signUpPasswordController,
+                  obscureText: !c.isSignUpPasswordVisible.value,
+                  suffixIcon: GestureDetector(
+                    onTap: c.toggleSignUpPasswordVisibility,
+                    child: Icon(
+                      c.isSignUpPasswordVisible.value
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: const Color(0xFFBDBDBD),
+                      size: 20.sp,
+                    ),
+                  ),
+                )),
 
                 SizedBox(height: 16.h),
 
-                // Re-Enter Password TextField
-                CustomTextField(
+// Re-Enter Password Field
+                Obx(() => CustomTextField(
                   icon: Icons.lock_outline,
                   labelText: 'Re Enter Password',
-                  controller: _reEnterPasswordController,
-                  obscureText: true,
+                  controller: c.signUpRePasswordController,
+                  obscureText: !c.isSignUpRePasswordVisible.value,
+                  suffixIcon: GestureDetector(
+                    onTap: c.toggleSignUpRePasswordVisibility,
+                    child: Icon(
+                      c.isSignUpRePasswordVisible.value
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: const Color(0xFFBDBDBD),
+                      size: 20.sp,
+                    ),
+                  ),
+                )),
+                SizedBox(height: 24.h),
+
+                // ── Register As label ─────────────────────────────
+                Text(
+                  'Register As',
+                  style: TextStyle(
+                    fontFamily: "Inter",
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF424242),
+                  ),
                 ),
+
+                SizedBox(height: 12.h),
+
+                // ── Role Selection ────────────────────────────────
+                Obx(() => Row(
+                  children: [
+                    Expanded(
+                      child: _RoleCard(
+                        label: 'Provider',
+                        icon: Icons.handyman_outlined,
+                        isSelected: c.selectedRole.value == 'PROVIDER',
+                        onTap: () => c.selectRole('PROVIDER'),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: _RoleCard(
+                        label: 'Customer',
+                        icon: Icons.person_outline,
+                        isSelected: c.selectedRole.value == 'CUSTOMER',
+                        onTap: () => c.selectRole('CUSTOMER'),
+                      ),
+                    ),
+                  ],
+                )),
 
                 SizedBox(height: 30.h),
 
                 // Sign Up Button
-                CustomButton(
-                  text: 'Sign Up',
-                  onPressed: () {
-                    Get.toNamed(RouteName.signin);
-                  },
-                ),
+                Obx(() => CustomButton(
+                  text: c.isLoading.value ? 'Signing Up...' : 'Sign Up',
+                  onPressed: c.isLoading.value ? null : () => c.register(),
+                )),
 
                 SizedBox(height: 20.h),
 
@@ -154,13 +172,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: _navigateToLogin,
+                      onTap: () => Get.back(),
                       child: Text(
                         "Login Here",
                         style: TextStyle(
                           fontFamily: "Inter",
                           fontSize: 14.sp,
-                          color: Color(0xFFF8C106),
+                          color: const Color(0xFFF8C106),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -172,6 +190,76 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Role Card Widget ─────────────────────────────────────────────
+class _RoleCard extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _RoleCard({
+    required this.label,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 70.h,
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFFF8C106).withOpacity(0.12)
+              : Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFFF8C106)
+                : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 22.sp,
+              color: isSelected
+                  ? const Color(0xFFF8C106)
+                  : Colors.grey.shade500,
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: "Inter",
+                fontSize: 14.sp,
+                fontWeight:
+                isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFFF8C106)
+                    : Colors.grey.shade600,
+              ),
+            ),
+            SizedBox(width: 4.w),
+            if (isSelected)
+              Icon(
+                Icons.check_circle,
+                size: 16.sp,
+                color: const Color(0xFFF8C106),
+              ),
+          ],
         ),
       ),
     );

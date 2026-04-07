@@ -1,24 +1,18 @@
+// lib/feature/auth/screens/sign_in_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../../routes/route_name.dart';
-import '../../../widget/auth/custom_button.dart';
 import '../../../widget/auth/custom_text_field.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-
-import '../controllers/sign_in_controller.dart';
-
+import '../controllers/auth_controller.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final c = Get.put(SignInController());
+    final c = AuthController.to;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F5EF),
@@ -77,18 +71,18 @@ class SignInScreen extends StatelessWidget {
               SizedBox(height: 24.h),
 
               // ── Email field ────────────────────────────────────
-              _buildInputField(
-                icon: Icons.mail_outline_rounded,
-                hint: 'Enter Email Address',
+              CustomTextField(
+                icon: Icons.email_outlined,
+                labelText: 'Enter Email Address',
                 controller: c.emailController,
                 keyboardType: TextInputType.emailAddress,
               ),
               SizedBox(height: 14.h),
 
               // ── Password field ─────────────────────────────────
-              Obx(() => _buildInputField(
+              Obx(() => CustomTextField(
                 icon: Icons.lock_outline_rounded,
-                hint: 'Enter Password',
+                labelText: 'Enter Password',
                 controller: c.passwordController,
                 obscureText: !c.isPasswordVisible.value,
                 suffixIcon: GestureDetector(
@@ -118,17 +112,28 @@ class SignInScreen extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // ── Sign In button ─────────────────────────────────
-              GestureDetector(
-                onTap: c.signIn,
+              Obx(() => GestureDetector(
+                onTap: c.isLoading.value ? null : c.signIn,
                 child: Container(
                   width: double.infinity,
                   height: 54.h,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8C106),
+                    color: c.isLoading.value
+                        ? const Color(0xFFF8C106).withOpacity(0.6)
+                        : const Color(0xFFF8C106),
                     borderRadius: BorderRadius.circular(30.r),
                   ),
                   alignment: Alignment.center,
-                  child: Text(
+                  child: c.isLoading.value
+                      ? SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                      : Text(
                     'Sign In',
                     style: TextStyle(
                       fontSize: 16.sp,
@@ -137,7 +142,7 @@ class SignInScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
+              )),
               SizedBox(height: 28.h),
 
               // ── Sign Up link ───────────────────────────────────
@@ -146,7 +151,8 @@ class SignInScreen extends StatelessWidget {
                 children: [
                   Text(
                     "Don't have an account? ",
-                    style: TextStyle(fontSize: 14.sp, color: const Color(0xFF9E9E9E)),
+                    style: TextStyle(
+                        fontSize: 14.sp, color: const Color(0xFF9E9E9E)),
                   ),
                   GestureDetector(
                     onTap: c.goToSignUp,
@@ -169,7 +175,6 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  // ─────────────────── Logo ──────────────────────────────────────
   Widget _buildLogo() {
     return Image.asset(
       'assets/images/auth/signin.png',
@@ -179,8 +184,8 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  // ─────────────────── Social Button ─────────────────────────────
-  Widget _buildSocialButton({required VoidCallback onTap, required Widget child}) {
+  Widget _buildSocialButton(
+      {required VoidCallback onTap, required Widget child}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -203,7 +208,6 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  // ─────────────────── Input Field ───────────────────────────────
   Widget _buildInputField({
     required IconData icon,
     required String hint,
@@ -233,8 +237,10 @@ class SignInScreen extends StatelessWidget {
         style: TextStyle(fontSize: 14.sp, color: const Color(0xFF212121)),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(fontSize: 14.sp, color: const Color(0xFFBDBDBD)),
-          prefixIcon: Icon(icon, color: const Color(0xFF9E9E9E), size: 20.sp),
+          hintStyle:
+          TextStyle(fontSize: 14.sp, color: const Color(0xFFBDBDBD)),
+          prefixIcon:
+          Icon(icon, color: const Color(0xFF9E9E9E), size: 20.sp),
           suffixIcon: suffixIcon,
           filled: true,
           fillColor: Colors.white,
@@ -248,8 +254,8 @@ class SignInScreen extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30.r),
-            borderSide: BorderSide(
-              color: const Color(0xFFFFC107),
+            borderSide: const BorderSide(
+              color: Color(0xFFFFC107),
               width: 1.5,
             ),
           ),
@@ -258,7 +264,6 @@ class SignInScreen extends StatelessWidget {
       ),
     );
   }
-
 }
 
 // ─────────────────── Google Icon ───────────────────────────────────

@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserInfo {
   static SharedPreferences? _prefs;
-
   // ── Call once in main() BEFORE runApp() ───────────────────────────
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();

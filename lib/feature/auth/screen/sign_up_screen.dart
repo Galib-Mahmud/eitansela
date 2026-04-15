@@ -18,7 +18,7 @@ class SignUpScreen extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F5EF),
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: screenHeight),
@@ -33,11 +33,44 @@ class SignUpScreen extends StatelessWidget {
                 CustomBackButton(),
 
                 SizedBox(height: 30.h),
+                // ── Continue with Google ───────────────────────────
+                _buildSocialButton(
+                  onTap: c.continueWithGoogle,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _GoogleIcon(),
+                      SizedBox(width: 12.w),
+                      Text(
+                        'Continue with Google',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF212121),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 14.h),
 
-                // Logo Image
-                Center(
-                  child: Image.asset(
-                    'assets/images/auth/signin.png',
+                // ── Continue with Apple ────────────────────────────
+                _buildSocialButton(
+                  onTap: c.continueWithApple,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.apple, size: 22.sp, color: Colors.black),
+                      SizedBox(width: 10.w),
+                      Text(
+                        'Continue with Apple',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF212121),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
@@ -262,6 +295,43 @@ class _RoleCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+Widget _buildSocialButton(
+    {required VoidCallback onTap, required Widget child}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      width: double.infinity,
+      height: 54.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      alignment: Alignment.center,
+      child: child,
+    ),
+  );
+}
+
+// ─────────────────── Google Icon ───────────────────────────────────
+class _GoogleIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/icons/devicon_google.png',
+      width: 22,
+      height: 22,
+      fit: BoxFit.contain,
     );
   }
 }

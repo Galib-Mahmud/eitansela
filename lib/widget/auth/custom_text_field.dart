@@ -22,13 +22,13 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 4,
+      elevation: 1.5,
       borderRadius: BorderRadius.circular(10.r),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
 
-           color: Color(0xFFFFFFFF).withOpacity(0.4),
+           color: Color(0xFFFFFFFF).withOpacity(0.8),
           borderRadius: BorderRadius.circular(10.r),
         ),
         padding: EdgeInsets.all(5.w),

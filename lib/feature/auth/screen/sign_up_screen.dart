@@ -32,7 +32,7 @@ class SignUpScreen extends StatelessWidget {
                 // Back button
                 CustomBackButton(),
 
-                SizedBox(height: 30.h),
+                SizedBox(height: 20.h),
                 // ── Continue with Google ───────────────────────────
                 _buildSocialButton(
                   onTap: c.continueWithGoogle,
@@ -74,7 +74,7 @@ class SignUpScreen extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(height: 30.h),
+                SizedBox(height: 20.h),
 
                 // Full Name TextField
                 CustomTextField(
@@ -144,14 +144,14 @@ class SignUpScreen extends StatelessWidget {
                     ),
                   ),
                 )),
-                SizedBox(height: 24.h),
+                SizedBox(height: 20.h),
 
                 // ── Register As label ─────────────────────────────
                 Text(
                   'Register As',
                   style: TextStyle(
                     fontFamily: "Inter",
-                    fontSize: 14.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF424242),
                   ),
@@ -197,10 +197,10 @@ class SignUpScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Already have an account? ",
+                      "Already have an account?  ",
                       style: TextStyle(
                         fontFamily: "Inter",
-                        fontSize: 14.sp,
+                        fontSize: 15.sp,
                         color: Colors.grey,
                       ),
                     ),
@@ -210,7 +210,7 @@ class SignUpScreen extends StatelessWidget {
                         "Login Here",
                         style: TextStyle(
                           fontFamily: "Inter",
-                          fontSize: 14.sp,
+                          fontSize: 16.sp,
                           color: const Color(0xFFF8C106),
                           fontWeight: FontWeight.bold,
                         ),
@@ -249,49 +249,31 @@ class _RoleCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: 70.h,
+        height: 50.h,
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFFF8C106).withOpacity(0.12)
+              ? const Color(0xFFF8C106)
               : Colors.grey.shade50,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: isSelected
-                ? const Color(0xFFF8C106)
-                : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
-          ),
+
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 22.sp,
-              color: isSelected
-                  ? const Color(0xFFF8C106)
-                  : Colors.grey.shade500,
-            ),
             SizedBox(width: 8.w),
+
             Text(
               label,
               style: TextStyle(
                 fontFamily: "Inter",
-                fontSize: 14.sp,
+                fontSize: 18.sp,
                 fontWeight:
                 isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected
-                    ? const Color(0xFFF8C106)
+                    ? Colors.white
                     : Colors.grey.shade600,
               ),
             ),
-            SizedBox(width: 4.w),
-            if (isSelected)
-              Icon(
-                Icons.check_circle,
-                size: 16.sp,
-                color: const Color(0xFFF8C106),
-              ),
           ],
         ),
       ),

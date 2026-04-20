@@ -86,6 +86,15 @@ class AuthController extends GetxController {
 
   final RxBool isSignUpPasswordVisible = false.obs;
   final RxBool isSignUpRePasswordVisible = false.obs;
+  // In AuthController
+  final isNewPasswordVisible = false.obs;
+  final isReNewPasswordVisible = false.obs;
+
+  void toggleNewPasswordVisibility() =>
+      isNewPasswordVisible.value = !isNewPasswordVisible.value;
+
+  void toggleReNewPasswordVisibility() =>
+      isReNewPasswordVisible.value = !isReNewPasswordVisible.value;
 
   void toggleSignUpPasswordVisibility() {
     isSignUpPasswordVisible.value = !isSignUpPasswordVisible.value;

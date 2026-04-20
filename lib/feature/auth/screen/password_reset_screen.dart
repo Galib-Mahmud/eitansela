@@ -9,6 +9,8 @@ import '../../../widget/auth/custom_back_button.dart';
 import '../../../widget/auth/custom_button.dart';
 import '../../../widget/auth/custom_text_field.dart';
 
+// lib/feature/auth/screens/password_reset_screen.dart
+
 class PasswordResetScreen extends StatelessWidget {
   const PasswordResetScreen({super.key});
 
@@ -53,32 +55,49 @@ class PasswordResetScreen extends StatelessWidget {
 
                 SizedBox(height: 30.h),
 
-                // New Password
-                CustomTextField(
+                // ── New Password ───────────────────────────────
+                Obx(() => CustomTextField(
                   icon: Icons.lock_outline,
                   labelText: 'Enter your new password',
                   controller: c.newPasswordController,
-                  obscureText: true,
-                ),
+                  obscureText: !c.isNewPasswordVisible.value,
+                  suffixIcon: GestureDetector(
+                    onTap: c.toggleNewPasswordVisibility,
+                    child: Icon(
+                      c.isNewPasswordVisible.value
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: const Color(0xFFBDBDBD),
+                      size: 20.sp,
+                    ),
+                  ),
+                )),
 
                 SizedBox(height: 16.h),
 
-                // Re-Enter New Password
-                CustomTextField(
+                // ── Re-Enter New Password ──────────────────────
+                Obx(() => CustomTextField(
                   icon: Icons.lock_outline,
                   labelText: 'Re-Enter new password',
                   controller: c.reNewPasswordController,
-                  obscureText: true,
-                ),
+                  obscureText: !c.isReNewPasswordVisible.value,
+                  suffixIcon: GestureDetector(
+                    onTap: c.toggleReNewPasswordVisibility,
+                    child: Icon(
+                      c.isReNewPasswordVisible.value
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: const Color(0xFFBDBDBD),
+                      size: 20.sp,
+                    ),
+                  ),
+                )),
 
                 SizedBox(height: 30.h),
 
                 Obx(() => CustomButton(
-                  text: c.isLoading.value
-                      ? 'Updating...'
-                      : 'Update Password',
-                  onPressed:
-                  c.isLoading.value ? null : c.resetPassword,
+                  text: c.isLoading.value ? 'Updating...' : 'Update Password',
+                  onPressed: c.isLoading.value ? null : c.resetPassword,
                 )),
 
                 SizedBox(height: 30.h),

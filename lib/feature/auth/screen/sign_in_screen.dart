@@ -152,14 +152,14 @@ class SignInScreen extends StatelessWidget {
                   Text(
                     "Don't have an account? ",
                     style: TextStyle(
-                        fontSize: 14.sp, color: const Color(0xFF9E9E9E)),
+                        fontSize: 15.sp, color: const Color(0xFF9E9E9E)),
                   ),
                   GestureDetector(
                     onTap: c.goToSignUp,
                     child: Text(
                       'Sign Up',
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFFF8C106),
                       ),
@@ -190,7 +190,7 @@ class SignInScreen extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 54.h,
+        height: 52.h,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30.r),

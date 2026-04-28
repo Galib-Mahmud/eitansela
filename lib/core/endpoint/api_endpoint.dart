@@ -19,4 +19,17 @@ class ApiEndpoint {
 
   // ─── Auth - Profile ────────────────────────────────────────────────
   static const String profile   = "/auth/profile/";
+
+
+// AI
+  static const String createRequest = "services/requests/";
+  static const String uploadMedia   = "services/media/upload/";
+
+
+//Home
+
+  static const String customerHomepage    = "/services/requests/customer/homepage/";
+  static const String allCustomerRequests = "/services/requests/customer/homepage/";
+  static const String notifications       = "/services/notifications/";
+
 }

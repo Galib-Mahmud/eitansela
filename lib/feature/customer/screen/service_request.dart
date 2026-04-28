@@ -1,14 +1,14 @@
+import 'dart:io';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
-import '../../../routes/route_name.dart';
+import 'home/controllers/request_controller.dart';
 
 class NewRequestScreen extends StatefulWidget {
-  const NewRequestScreen({super.key});
+  final int serviceId;
+  const NewRequestScreen({super.key, this.serviceId = 1});
 
   @override
   State<NewRequestScreen> createState() => _NewRequestScreenState();
@@ -16,13 +16,17 @@ class NewRequestScreen extends StatefulWidget {
 
 class _NewRequestScreenState extends State<NewRequestScreen> {
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _zipController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
-  final List<XFile> _selectedImages = [];
-  bool _isEmergency = false;
-  bool _canCall = false;
+  final TextEditingController _addressController     = TextEditingController();
+  final TextEditingController _zipController         = TextEditingController();
+  final TextEditingController _phoneController       = TextEditingController();
+
+  late final RequestController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = Get.put(RequestController());
+  }
 
   @override
   void dispose() {
@@ -33,28 +37,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     super.dispose();
   }
 
-  Future<void> _pickImages() async {
-    try {
-      final List<XFile> images = await _picker.pickMultiImage(
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 85,
-      );
-      if (images.isNotEmpty) {
-        setState(() {
-          if (_selectedImages.length + images.length <= 5) {
-            _selectedImages.addAll(images);
-          } else {
-            int remaining = 5 - _selectedImages.length;
-            _selectedImages.addAll(images.take(remaining));
-          }
-        });
-      }
-    } catch (e) {
-      debugPrint('Error picking images: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,12 +45,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
         child: Column(
           children: [
             SizedBox(height: 16.h),
-            // App bar
             _buildAppBar(),
             SizedBox(height: 12.h),
             Divider(color: const Color(0xFFEEEEEE), thickness: 1, height: 1),
-
-            // Scrollable content
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -77,68 +56,69 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   children: [
                     SizedBox(height: 24.h),
 
-                    // Describe your Problem
                     _buildSectionTitle('Describe your Problem'),
                     SizedBox(height: 10.h),
                     _buildDescriptionField(),
 
                     SizedBox(height: 24.h),
 
-                    // Upload Files
                     _buildSectionTitle('Upload Files'),
                     SizedBox(height: 10.h),
                     _buildUploadArea(),
+                    SizedBox(height: 12.h),
+
+                    // ── Selected Images Preview ──────────────────
+                    Obx(() => _ctrl.selectedImages.isNotEmpty
+                        ? _buildImagePreview()
+                        : const SizedBox.shrink()),
 
                     SizedBox(height: 24.h),
 
-                    // Address
                     _buildSectionTitle('Address'),
                     SizedBox(height: 10.h),
                     _buildInputField(
                       controller: _addressController,
                       hintText: 'Street and House Address...',
-                      iconPath: 'assets/images/request/location_icon.png',
-                      iconFallback: Icons.location_on,
+                      icon: Icons.location_on,
                       iconColor: const Color(0xFFE53935),
                     ),
 
                     SizedBox(height: 24.h),
 
-                    // Zip Code
                     _buildSectionTitle('Zip Code'),
                     SizedBox(height: 10.h),
                     _buildInputField(
                       controller: _zipController,
                       hintText: '1234',
-                      iconPath: 'assets/images/request/zip_icon.png',
-                      iconFallback: Icons.flag,
+                      icon: Icons.flag,
                       iconColor: const Color(0xFFE53935),
                       keyboardType: TextInputType.number,
                     ),
 
                     SizedBox(height: 24.h),
 
-                    // Phone Number
                     _buildSectionTitle('Phone Number'),
                     SizedBox(height: 10.h),
                     _buildInputField(
                       controller: _phoneController,
-                      hintText: '1233453546546',
-                      iconPath: 'assets/images/request/phone_icon.png',
-                      iconFallback: Icons.phone,
+                      hintText: '+49 123 456 7890',
+                      icon: Icons.phone,
                       iconColor: const Color(0xFF424242),
                       keyboardType: TextInputType.phone,
                     ),
 
                     SizedBox(height: 20.h),
 
-                    // Emergency Service
-                    buildNoCallCard(),
-                    SizedBox(height: 20.h),
-                    _buildNoCallCard(),
+                    // ── Can Call Card ────────────────────────────
+                    Obx(() => _buildCanCallCard()),
+                    SizedBox(height: 16.h),
+
+                    // ── Emergency Card ───────────────────────────
+                    Obx(() => _buildEmergencyCard()),
                     SizedBox(height: 24.h),
-                    // Continue button
-                    _buildContinueButton(),
+
+                    // ── Continue Button ──────────────────────────
+                    Obx(() => _buildContinueButton()),
                     SizedBox(height: 30.h),
                   ],
                 ),
@@ -158,11 +138,8 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
         children: [
           GestureDetector(
             onTap: () => Get.back(),
-            child: Icon(
-              Icons.arrow_back,
-              color: const Color(0xFF212121),
-              size: 24.sp,
-            ),
+            child: Icon(Icons.arrow_back,
+                color: const Color(0xFF212121), size: 24.sp),
           ),
           SizedBox(width: 16.w),
           Text(
@@ -194,13 +171,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   Widget _buildDescriptionField() {
     return TextField(
       controller: _descriptionController,
-      maxLines: 2,
+      maxLines: 3,
       decoration: InputDecoration(
         hintText: 'Tell us what you need help with..',
-        hintStyle: TextStyle(
-          fontSize: 14.sp,
-          color: const Color(0xFFBDBDBD),
-        ),
+        hintStyle: TextStyle(fontSize: 14.sp, color: const Color(0xFFBDBDBD)),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
@@ -221,10 +195,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     );
   }
 
-  // ───────────────────── Upload Area (Dashed Border) ────────────────
+  // ───────────────────── Upload Area ─────────────────────────────────
   Widget _buildUploadArea() {
     return GestureDetector(
-      onTap: _selectedImages.length < 5 ? _pickImages : null,
+      onTap: () => _ctrl.pickImages(),
       child: CustomPaint(
         painter: _DashedBorderPainter(
           color: const Color(0xFFF8C106),
@@ -238,11 +212,8 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           padding: EdgeInsets.symmetric(vertical: 32.h),
           child: Column(
             children: [
-              Icon(
-                Icons.cloud_upload_outlined,
-                color: const Color(0xFFF8C106),
-                size: 32.sp,
-              ),
+              Icon(Icons.cloud_upload_outlined,
+                  color: const Color(0xFFF8C106), size: 32.sp),
               SizedBox(height: 10.h),
               Text(
                 'Tap to capture or upload',
@@ -254,11 +225,8 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
               ),
               SizedBox(height: 4.h),
               Text(
-                'JPG, PNG (max 10MB)',
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: const Color(0xFF9E9E9E),
-                ),
+                'JPG, PNG (max 5 images)',
+                style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E)),
               ),
             ],
           ),
@@ -267,12 +235,53 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     );
   }
 
+  // ───────────────────── Image Preview ───────────────────────────────
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 80.w,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _ctrl.selectedImages.length,
+        separatorBuilder: (_, __) => SizedBox(width: 8.w),
+        itemBuilder: (context, index) {
+          return Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10.r),
+                child: Image.file(
+                  File(_ctrl.selectedImages[index].path),
+                  width: 80.w,
+                  height: 80.w,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                top: 2,
+                right: 2,
+                child: GestureDetector(
+                  onTap: () => _ctrl.removeImage(index),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.close,
+                        color: Colors.white, size: 14.sp),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   // ───────────────────── Input Field ─────────────────────────────────
   Widget _buildInputField({
     required TextEditingController controller,
     required String hintText,
-    required String iconPath,
-    required IconData iconFallback,
+    required IconData icon,
     required Color iconColor,
     TextInputType keyboardType = TextInputType.text,
   }) {
@@ -281,17 +290,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
       keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(
-          fontSize: 14.sp,
-          color: const Color(0xFFBDBDBD),
-        ),
+        hintStyle: TextStyle(fontSize: 14.sp, color: const Color(0xFFBDBDBD)),
         prefixIcon: Padding(
           padding: EdgeInsets.all(12.w),
-          child: Icon(
-            iconFallback,
-            color: iconColor,
-            size: 22.sp,
-          ),
+          child: Icon(icon, color: iconColor, size: 22.sp),
         ),
         filled: true,
         fillColor: Colors.white,
@@ -313,45 +315,23 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     );
   }
 
-
-  Widget buildNoCallCard() {
+  // ───────────────────── Can Call Card ───────────────────────────────
+  Widget _buildCanCallCard() {
     return GestureDetector(
-      onTap: () => setState(() => _canCall = !_canCall),
+      onTap: () => _ctrl.canCall.toggle(),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(
-          color:  Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: const Color(0xFFBDBDBD),
-            width: 1,
-          ),
-
+          border: Border.all(color: const Color(0xFFBDBDBD)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Checkbox
-            Container(
-              width: 22.w,
-              height: 22.w,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4.r),
-                border: Border.all(
-                  color: _canCall
-                      ? const Color(0xFFF8C106)
-                      : const Color(0xFFBDBDBD),
-                  width: 2,
-                ),
-                color: _canCall ? const Color(0xFFF8C106) : Colors.white,
-              ),
-              child: _canCall
-                  ? Icon(Icons.check, color: Colors.white, size: 14.sp)
-                  : null,
-            ),
+            _buildCheckbox(_ctrl.canCall.value),
             SizedBox(width: 12.w),
-            // Text
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,12 +344,11 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         color: const Color(0xFF212121),
                       ),
                       children: [
-                        const TextSpan(text: 'Mark as Emergency Service '),
+                        const TextSpan(text: 'Allow provider to call me '),
                         TextSpan(
-                          text: '(+€30)',
+                          text: '(Recommended)',
                           style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 13.sp,
                             color: const Color(0xFF4CAF50),
                           ),
                         ),
@@ -378,11 +357,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'Get priority placement and faster response times from providers',
+                    'Provider can call you directly to discuss the issue.',
                     style: TextStyle(
-                      fontSize: 12.sp,
-                      color: const Color(0xFF757575),
-                    ),
+                        fontSize: 12.sp, color: const Color(0xFF757575)),
                   ),
                 ],
               ),
@@ -394,45 +371,24 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   }
 
   // ───────────────────── Emergency Card ──────────────────────────────
-  Widget _buildNoCallCard() {
+  Widget _buildEmergencyCard() {
     return GestureDetector(
-      onTap: () => setState(() => _isEmergency = !_isEmergency),
+      onTap: () => _ctrl.isEmergency.toggle(),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(
-          color: _isEmergency
+          color: _ctrl.isEmergency.value
               ? const Color(0xFFFFEBEE)
               : const Color(0xFFFFEBEE).withOpacity(0.5),
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: const Color(0xFFEF5350),
-            width: 1,
-          ),
+          border: Border.all(color: const Color(0xFFEF5350)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Checkbox
-            Container(
-              width: 22.w,
-              height: 22.w,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4.r),
-                border: Border.all(
-                  color: _isEmergency
-                      ? const Color(0xFFF8C106)
-                      : const Color(0xFFBDBDBD),
-                  width: 2,
-                ),
-                color: _isEmergency ? const Color(0xFFF8C106) : Colors.white,
-              ),
-              child: _isEmergency
-                  ? Icon(Icons.check, color: Colors.white, size: 14.sp)
-                  : null,
-            ),
+            _buildCheckbox(_ctrl.isEmergency.value),
             SizedBox(width: 12.w),
-            // Text
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -459,11 +415,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'Get priority placement and faster response times from providers',
+                    'Get priority placement and faster response times from providers.',
                     style: TextStyle(
-                      fontSize: 12.sp,
-                      color: const Color(0xFF757575),
-                    ),
+                        fontSize: 12.sp, color: const Color(0xFF757575)),
                   ),
                 ],
               ),
@@ -474,21 +428,51 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     );
   }
 
+  // ───────────────────── Checkbox ────────────────────────────────────
+  Widget _buildCheckbox(bool checked) {
+    return Container(
+      width: 22.w,
+      height: 22.w,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4.r),
+        border: Border.all(
+          color: checked ? const Color(0xFFF8C106) : const Color(0xFFBDBDBD),
+          width: 2,
+        ),
+        color: checked ? const Color(0xFFF8C106) : Colors.white,
+      ),
+      child: checked
+          ? Icon(Icons.check, color: Colors.white, size: 14.sp)
+          : null,
+    );
+  }
+
   // ───────────────────── Continue Button ─────────────────────────────
   Widget _buildContinueButton() {
     return GestureDetector(
-      onTap: () {
-        Get.toNamed(RouteName.newRequestAnalysis);
-      },
+      onTap: _ctrl.isLoading.value
+          ? null
+          : () => _ctrl.submitRequest(
+        serviceId: widget.serviceId,
+        description: _descriptionController.text,
+        address: _addressController.text,
+        zipCode: _zipController.text,
+        phoneNumber: _phoneController.text,
+      ),
       child: Container(
         width: double.infinity,
         height: 54.h,
         decoration: BoxDecoration(
-          color: const Color(0xFFF8C106),
+          color: _ctrl.isLoading.value
+              ? const Color(0xFFF8C106).withOpacity(0.6)
+              : const Color(0xFFF8C106),
           borderRadius: BorderRadius.circular(27.r),
         ),
         child: Center(
-          child: Text(
+          child: _ctrl.isLoading.value
+              ? const CircularProgressIndicator(
+              color: Colors.white, strokeWidth: 2)
+              : Text(
             'Continue to Diagnosis',
             style: TextStyle(
               fontSize: 16.sp,
@@ -526,12 +510,8 @@ class _DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final RRect rRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(
-        strokeWidth / 2,
-        strokeWidth / 2,
-        size.width - strokeWidth,
-        size.height - strokeWidth,
-      ),
+      Rect.fromLTWH(strokeWidth / 2, strokeWidth / 2,
+          size.width - strokeWidth, size.height - strokeWidth),
       Radius.circular(borderRadius),
     );
 

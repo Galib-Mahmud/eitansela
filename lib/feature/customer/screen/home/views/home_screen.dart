@@ -1,92 +1,121 @@
-import 'package:eitansela/routes/route_name.dart';
+// lib/features/home/views/home_dashboard_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../../routes/route_name.dart';
 import '../../../notification/views/notifications_screen.dart';
 import '../../../order/views/in_progress_screen.dart';
 import '../../recent_request_screen.dart';
+import '../controllers/home_controller.dart';
 
 class HomeDashboardScreen extends StatelessWidget {
   const HomeDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final HomeController ctrl = Get.put(HomeController());
+
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 16.h),
-              _buildHeader(),
-              SizedBox(height: 20.h),
-              _buildSearchBar(),
-              SizedBox(height: 24.h),
-              _buildRecentRequestHeader(),
-              SizedBox(height: 12.h),
-              _buildRecentRequests(),
-              SizedBox(height: 24.h),
-              _buildServicesGrid(),
-              SizedBox(height: 90.h),
-            ],
-          ),
-        ),
+        child: Obx(() {
+          if (ctrl.isLoading.value && ctrl.categories.isEmpty) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFFF8C106)),
+            );
+          }
+          return RefreshIndicator(
+            color: const Color(0xFFF8C106),
+            onRefresh: () => ctrl.fetchHomepage(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 16.h),
+                  _buildHeader(ctrl),
+                  SizedBox(height: 20.h),
+                  _buildSearchBar(ctrl),
+                  SizedBox(height: 24.h),
+                  _buildRecentRequestHeader(ctrl),
+                  SizedBox(height: 12.h),
+                  _buildRecentRequests(ctrl),
+                  SizedBox(height: 24.h),
+                  _buildServicesGrid(ctrl),
+                  SizedBox(height: 90.h),
+                ],
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
 
   // ───────────────────────── Header ──────────────────────────────────
-  Widget _buildHeader() {
+  Widget _buildHeader(HomeController ctrl) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(
         children: [
-          // Profile Image
-          Container(
-            width: 50.w,
-            height: 50.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: const DecorationImage(
-                image: AssetImage('assets/images/profile/profile.png'),
-                fit: BoxFit.cover,
+          // Profile Avatar with first letter
+          Obx(() {
+            final name = ctrl.profile.value?['full_name'] ?? '';
+            return Container(
+              width: 50.w,
+              height: 50.w,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0xFFF8C106),
               ),
-            ),
-          ),
-          SizedBox(width: 12.w),
-          // Greeting
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Good Morning!',
+              child: Center(
+                child: Text(
+                  name.isNotEmpty ? name[0].toUpperCase() : 'U',
                   style: TextStyle(
-                    fontSize: 13.sp,
-                    color: const Color(0xFF757575),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  'Kurt Cobain',
-                  style: TextStyle(
-                    fontSize: 17.sp,
+                    fontSize: 20.sp,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF212121),
+                    color: Colors.white,
                   ),
                 ),
-              ],
-            ),
+              ),
+            );
+          }),
+          SizedBox(width: 12.w),
+          // Greeting + Name
+          Expanded(
+            child: Obx(() {
+              final name = ctrl.profile.value?['full_name'] ?? 'User';
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Good Morning!',
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: const Color(0xFF757575),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF212121),
+                    ),
+                  ),
+                ],
+              );
+            }),
           ),
           // Notification Icon
           GestureDetector(
             onTap: () {
-              Get.to(
-                  ()=> const NotificationsScreen(),
-              );
+              ctrl.fetchNotifications();
+              Get.to(() => const NotificationsScreen());
             },
             child: Icon(
               Icons.notifications_none_rounded,
@@ -100,7 +129,7 @@ class HomeDashboardScreen extends StatelessWidget {
   }
 
   // ───────────────────── Search Bar ──────────────────────────────────
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(HomeController ctrl) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Container(
@@ -113,22 +142,43 @@ class HomeDashboardScreen extends StatelessWidget {
             color: const Color(0xFFE0E0E0),
             width: 1,
           ),
+          // ✅ কোনো boxShadow নেই — plain white
         ),
         child: Row(
           children: [
+            Image.asset(
+              'assets/images/profile/3.png',
+              width: 20.w,
+              height: 20.w,
+              fit: BoxFit.contain,
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: TextField(
+                onChanged: (val) => ctrl.searchQuery.value = val,
+                decoration: InputDecoration(
+                  hintText: 'What do you need help with?',
+                  hintStyle: TextStyle(
+                    fontSize: 14.sp,
+                    color: const Color(0xFFBDBDBD), // ✅ light grey
+                    fontWeight: FontWeight.w400,
+                  ),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                  fillColor: Colors.white,  // ✅ white background
+                  filled: true,
+                ),
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: const Color(0xFF212121),
+                ),
+              ),
+            ),
             Icon(
               Icons.search,
               color: const Color(0xFFBDBDBD),
               size: 22.sp,
-            ),
-            SizedBox(width: 12.w),
-            Text(
-              'What do you need help with?',
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: const Color(0xFFBDBDBD),
-                fontWeight: FontWeight.w400,
-              ),
             ),
           ],
         ),
@@ -137,7 +187,7 @@ class HomeDashboardScreen extends StatelessWidget {
   }
 
   // ───────────────── Recent Request Header ───────────────────────────
-  Widget _buildRecentRequestHeader() {
+  Widget _buildRecentRequestHeader(HomeController ctrl) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(
@@ -153,9 +203,8 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              Get.to(
-                () => const RecentRequestScreen(),
-              );
+              ctrl.fetchAllRequests();
+              Get.to(() => const RecentRequestScreen());
             },
             child: Text(
               'See All',
@@ -172,77 +221,123 @@ class HomeDashboardScreen extends StatelessWidget {
   }
 
   // ───────────────── Recent Request Cards ────────────────────────────
-  Widget _buildRecentRequests() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: Column(
-        children: [
-          _buildRecentRequestCard(
-            iconPath: 'assets/images/profile/water.png',
-            title: 'Kitchen Sink Leak',
-            date: 'oct 24 - Complete',
-            status: 'IN Process',
+  Widget _buildRecentRequests(HomeController ctrl) {
+    return Obx(() {
+      if (ctrl.recentRequests.isEmpty) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 24.h),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: const Color(0xFFE8E8E8)),
+            ),
+            child: Center(
+              child: Text(
+                'No recent requests',
+                style: TextStyle(fontSize: 14.sp, color: const Color(0xFF9E9E9E)),
+              ),
+            ),
+          ),
+        );
+      }
 
-          ),
-          SizedBox(height: 12.h),
-          _buildRecentRequestCard(
-            iconPath: 'assets/images/profile/water.png',
-            title: 'Kitchen Sink Leak',
-            date: 'oct 24 - Complete',
-            status: 'IN Process',
-          ),
-        ],
-      ),
-    );
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        child: Column(
+          children: ctrl.recentRequests.asMap().entries.map((entry) {
+            final i    = entry.key;
+            final item = entry.value;
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: i < ctrl.recentRequests.length - 1 ? 12.h : 0,
+              ),
+              child: _buildRequestCard(item),
+            );
+          }).toList(),
+        ),
+      );
+    });
   }
 
-  Widget _buildRecentRequestCard({
-    required String iconPath,
-    required String title,
-    required String date,
-    required String status,
-  }) {
+  // ───────────────────── Services Grid ───────────────────────────────
+  Widget _buildServicesGrid(HomeController ctrl) {
+    return Obx(() {
+      if (ctrl.categories.isEmpty) return const SizedBox.shrink();
+
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 14.w,
+            mainAxisSpacing: 14.h,
+            childAspectRatio: 0.95,
+          ),
+          itemCount: ctrl.categories.length,
+          itemBuilder: (context, index) {
+            final category = ctrl.categories[index];
+            return _buildServiceCard(
+              category: category,
+              onTap: () {
+                Get.toNamed(
+                  RouteName.newRequest,
+                  arguments: {'serviceId': category['id']},
+                );
+              },
+            );
+          },
+        ),
+      );
+    });
+  }
+
+  // ───────────────────── Request Card (shared) ───────────────────────
+  Widget _buildRequestCard(Map<String, dynamic> item) {
+    final status      = item['status'] ?? 'PENDING';
+    final displayText = item['display_text'] ?? '';
+    final serviceName = item['service_name']?.toString().isNotEmpty == true
+        ? item['service_name']
+        : 'Service Request';
+    final assetPath   = HomeController.assetFromString(item['service_icon'] ?? '');
+
     return GestureDetector(
-      onTap: (){
-        Get.to(
-              () => const InProgressScreen(),
-        );
-      },
+      onTap: () => Get.to(() => const InProgressScreen()),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(
-            color: const Color(0xFFE8E8E8),
-            width: 1,
-          ),
+          border: Border.all(color: const Color(0xFFE8E8E8)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.08),
               blurRadius: 10,
-              spreadRadius: 0,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
-            // Icon
+            // Asset Image
             Image.asset(
-              iconPath,
+              assetPath,
               width: 36.w,
               height: 36.w,
               fit: BoxFit.contain,
             ),
             SizedBox(width: 14.w),
-            // Title and Date
+            // Title + Date
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    serviceName,
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
@@ -251,11 +346,10 @@ class HomeDashboardScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 3.h),
                   Text(
-                    date,
+                    displayText,
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: const Color(0xFFBDBDBD),
-                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
@@ -263,9 +357,9 @@ class HomeDashboardScreen extends StatelessWidget {
             ),
             // Status Badge
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
               decoration: BoxDecoration(
-                color: const Color(0xFFE0F2F1),
+                color: HomeController.statusBgColor(status),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Text(
@@ -273,7 +367,7 @@ class HomeDashboardScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF00897B),
+                  color: HomeController.statusColor(status),
                 ),
               ),
             ),
@@ -283,63 +377,27 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  // ───────────────────── Services Grid ───────────────────────────────
-  Widget _buildServicesGrid() {
-    final services = [
-      {'image': 'assets/images/profile/water.png', 'label': 'Plumbing'},
-      {'image': 'assets/images/profile/2.png', 'label': 'Electrical'},
-      {'image': 'assets/images/profile/3.png', 'label': 'Ac & HVAC'},
-      {'image': 'assets/images/profile/7.png', 'label': 'Painting'},
-      {'image': 'assets/images/profile/8.png', 'label': 'Moving'},
-      {'image': 'assets/images/profile/12.png', 'label': 'Gardening'},
-    ];
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 14.w,
-          mainAxisSpacing: 14.h,
-          childAspectRatio: 0.95,
-        ),
-        itemCount: services.length,
-        itemBuilder: (context, index) {
-          return _buildServiceCard(
-            imagePath: services[index]['image']!,
-            label: services[index]['label']!,
-            onTap: () {
-              Get.toNamed(RouteName.newRequest);
-            },
-          );
-        },
-      ),
-    );
-  }
-
+  // ───────────────────── Service Card ────────────────────────────────
   Widget _buildServiceCard({
-    required String imagePath,
-    required String label,
+    required Map<String, dynamic> category,
     VoidCallback? onTap,
   }) {
+    final assetPath = HomeController.assetFromString(category['icon'] ?? '');
+    final label     = category['name_en'] ?? '';
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFFF5F5F5),
           borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(
-            color: const Color(0xFFE8E8E8),
-            width: 1,
-          ),
+          border: Border.all(color: const Color(0xFFE8E8E8)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              imagePath,
+              assetPath,
               width: 44.w,
               height: 44.w,
               fit: BoxFit.contain,

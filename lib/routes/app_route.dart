@@ -42,7 +42,10 @@ class AppRoute {
       page: () => PasswordResetSuccessScreen(),
     ),
     GetPage(name: RouteName.resetPass, page: () => PasswordResetScreen()),
-    GetPage(name: RouteName.otpVerification, page: () => OtpVerificationScreen()),
+    GetPage(
+      name: RouteName.otpVerification,
+      page: () => OtpVerificationScreen(),
+    ),
     GetPage(name: RouteName.forgetPass, page: () => ForgotPasswordScreen()),
     GetPage(name: RouteName.splashScreen, page: () => SplashScreen()),
     GetPage(name: RouteName.onboarding1, page: () => Onboarding1Screen()),

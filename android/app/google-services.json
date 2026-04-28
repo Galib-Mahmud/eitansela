@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "493335100398",
+    "project_id": "note-f5631",
+    "storage_bucket": "note-f5631.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493335100398:android:c712df11adf3457ff9ecff",
+        "android_client_info": {
+          "package_name": "com.example.eitansela"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "493335100398-e83kab3ev12rihm1e4uf1iv6g0gmrk84.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.eitansela",
+            "certificate_hash": "350f5d73e471dcbb5518d5d26ac90a7372e29387"
+          }
+        },
+        {
+          "client_id": "493335100398-cp5u5jkfq87negpnc4ueb0n1sve1pu57.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjzuo3Bu8asPc4u6IxrJQM8GpeG1nqVxQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "493335100398-cp5u5jkfq87negpnc4ueb0n1sve1pu57.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "493335100398-r7p1k1iplh372gopgiuq4gqpitnfo5nt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.eitansela"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493335100398:android:74a3ff406409318af9ecff",
+        "android_client_info": {
+          "package_name": "com.example.note_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "493335100398-cp5u5jkfq87negpnc4ueb0n1sve1pu57.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjzuo3Bu8asPc4u6IxrJQM8GpeG1nqVxQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "493335100398-cp5u5jkfq87negpnc4ueb0n1sve1pu57.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "493335100398-r7p1k1iplh372gopgiuq4gqpitnfo5nt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.eitansela"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

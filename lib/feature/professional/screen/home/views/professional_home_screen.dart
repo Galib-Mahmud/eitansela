@@ -1,9 +1,12 @@
-import 'package:eitansela/feature/customer/notification/views/notifications_screen.dart';
+// lib/features/professional/home/views/professional_home_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../../../../customer/screen/home/controllers/report_issue_controller.dart';
+
+import '../../../../customer/notification/views/notifications_screen.dart';
 import '../../activejobscreen.dart';
+import '../../../../customer/screen/home/controllers/report_issue_controller.dart';
 import '../controllers/professional_home_controller.dart';
 
 class ProfessionalHomeScreen extends StatelessWidget {
@@ -16,60 +19,143 @@ class ProfessionalHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F4),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildProfileCard(c),
-              SizedBox(height: 12.h),
-              _buildOnlineToggle(c),
-              SizedBox(height: 12.h),
-              _buildStatsRow(c),
-              SizedBox(height: 20.h),
-              _buildSectionHeader(
-                title: 'Active Jobs',
-                badge: c.activeJobs.length.toString(),
+        child: Obx(() {
+          if (c.isLoading.value &&
+              c.activeJobs.isEmpty &&
+              c.newRequests.isEmpty) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFFF8C106)),
+            );
+          }
+
+          return RefreshIndicator(
+            color: const Color(0xFFF8C106),
+            onRefresh: () async {
+              await c.fetchProfile();
+              await c.fetchHomepage();
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildProfileCard(c),
+                  SizedBox(height: 12.h),
+                  _buildOnlineToggle(c),
+                  SizedBox(height: 12.h),
+                  _buildStatsRow(c),
+                  SizedBox(height: 20.h),
+
+                  // ── Active Jobs ──────────────────────────────────
+                  Obx(() => _buildSectionHeader(
+                    title: 'Active Jobs',
+                    badge: c.activeJobs.length.toString(),
+                  )),
+                  SizedBox(height: 10.h),
+                  Obx(() {
+                    if (c.activeJobs.isEmpty) {
+                      return _buildEmptyCard('No active jobs');
+                    }
+                    return Column(
+                      children: c.activeJobs
+                          .map((job) => _buildActiveJobCard(job, context))
+                          .toList(),
+                    );
+                  }),
+
+                  SizedBox(height: 20.h),
+
+                  // ── Emergency Requests ───────────────────────────
+                  _buildSectionHeader(
+                    title: 'Emergency Request',
+                    showViewAll: true,
+                    onViewAll: () {},
+                  ),
+                  SizedBox(height: 10.h),
+                  Obx(() {
+                    if (c.emergencyRequests.isEmpty) {
+                      return _buildEmptyCard('No emergency requests');
+                    }
+                    return Column(
+                      children: c.emergencyRequests
+                          .map((r) => Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: _buildJobRequestCard(r),
+                      ))
+                          .toList(),
+                    );
+                  }),
+
+                  SizedBox(height: 8.h),
+
+                  // ── New Requests ─────────────────────────────────
+                  _buildSectionHeader(
+                    title: 'New Requests',
+                    showViewAll: true,
+                    onViewAll: () {},
+                  ),
+                  SizedBox(height: 10.h),
+                  Obx(() {
+                    if (c.newRequests.isEmpty) {
+                      return _buildEmptyCard('No new requests');
+                    }
+                    return Column(
+                      children: c.newRequests
+                          .map((r) => Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: _buildJobRequestCard(r),
+                      ))
+                          .toList(),
+                    );
+                  }),
+
+                  SizedBox(height: 8.h),
+
+                  // ── Private Requests ─────────────────────────────
+                  Obx(() => c.privateRequests.isNotEmpty
+                      ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionHeader(
+                        title: 'Private Requests',
+                        showViewAll: true,
+                        onViewAll: () {},
+                      ),
+                      SizedBox(height: 10.h),
+                      ...c.privateRequests.map((r) => Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: _buildJobRequestCard(r),
+                      )),
+                    ],
+                  )
+                      : const SizedBox.shrink()),
+
+                  SizedBox(height: 20.h),
+                ],
               ),
-              SizedBox(height: 10.h),
-              Obx(() => Column(
-                children: c.activeJobs
-                    .map((job) => _buildActiveJobCard(job,context))
-                    .toList(),
-              )),
-              SizedBox(height: 20.h),
-              _buildSectionHeader(
-                title: 'Emergency Request',
-                showViewAll: true,
-                onViewAll: () {},
-              ),
-              SizedBox(height: 10.h),
-              Obx(() => Column(
-                children: c.emergencyRequests
-                    .map((r) => Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: _buildJobRequestCard(r),
-                ))
-                    .toList(),
-              )),
-              SizedBox(height: 8.h),
-              _buildSectionHeader(
-                title: 'New Requests',
-                showViewAll: true,
-                onViewAll: () {},
-              ),
-              SizedBox(height: 10.h),
-              Obx(() => Column(
-                children: c.newRequests
-                    .map((r) => Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: _buildJobRequestCard(r),
-                ))
-                    .toList(),
-              )),
-              SizedBox(height: 20.h),
-            ],
-          ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  // ─────────────────── Empty State Card ──────────────────────────
+  Widget _buildEmptyCard(String message) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 20.h),
+      margin: EdgeInsets.only(bottom: 12.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: const Color(0xFFEEEEEE)),
+      ),
+      child: Center(
+        child: Text(
+          message,
+          style: TextStyle(fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
         ),
       ),
     );
@@ -83,36 +169,41 @@ class ProfessionalHomeScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(28.r),
-            child: Image.asset(
-              c.professionalImage.value,
-              width: 52.w,
-              height: 52.w,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+          // ── Profile Photo ──────────────────────────────────────
+          Obx(() {
+            final imageUrl = c.professionalImage.value;
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(28.r),
+              child: imageUrl.isNotEmpty
+                  ? Image.network(
+                imageUrl,
                 width: 52.w,
                 height: 52.w,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE0E0E0),
-                  borderRadius: BorderRadius.circular(28.r),
-                ),
-                child: Icon(Icons.person, size: 28.sp, color: const Color(0xFF9E9E9E)),
-              ),
-            ),
-          ),
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _buildAvatarFallback(c),
+              )
+                  : _buildAvatarFallback(c),
+            );
+          }),
           SizedBox(width: 14.w),
+
+          // ── Name + Role ────────────────────────────────────────
           Expanded(
             child: Obx(() => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  c.professionalName.value,
+                  c.professionalName.value.isNotEmpty
+                      ? c.professionalName.value
+                      : 'Professional',
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w700,
@@ -121,21 +212,21 @@ class ProfessionalHomeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 3.h),
                 Text(
-                  'Professional',
-                  style: TextStyle(fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
+                  c.professionalRole.value,
+                  style: TextStyle(
+                      fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
                 ),
               ],
             )),
           ),
+
+          // ── Notification Bell ──────────────────────────────────
           GestureDetector(
-            onTap: (){
-              Get.to(
-                () => const NotificationsScreen(),
-              );
-            },
+            onTap: () => Get.to(() => const NotificationsScreen()),
             child: Stack(
               children: [
-                Icon(Icons.notifications, color: const Color(0xFF212121), size: 26.sp),
+                Icon(Icons.notifications,
+                    color: const Color(0xFF212121), size: 26.sp),
                 Positioned(
                   top: 0,
                   right: 0,
@@ -156,6 +247,27 @@ class ProfessionalHomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildAvatarFallback(ProfessionalHomeController c) {
+    final name = c.professionalName.value;
+    return Container(
+      width: 52.w,
+      height: 52.w,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8C106),
+        borderRadius: BorderRadius.circular(28.r),
+      ),
+      child: Center(
+        child: Text(
+          name.isNotEmpty ? name[0].toUpperCase() : 'P',
+          style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.white),
+        ),
+      ),
+    );
+  }
+
   // ─────────────────── Online Toggle ─────────────────────────────
   Widget _buildOnlineToggle(ProfessionalHomeController c) {
     return Container(
@@ -164,7 +276,10 @@ class ProfessionalHomeScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Obx(() => Row(
@@ -186,7 +301,8 @@ class ProfessionalHomeScreen extends StatelessWidget {
                   c.isOnline.value
                       ? 'Receiving new job requests'
                       : 'Not receiving job requests',
-                  style: TextStyle(fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
+                  style: TextStyle(
+                      fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
                 ),
               ],
             ),
@@ -213,8 +329,10 @@ class ProfessionalHomeScreen extends StatelessWidget {
             iconWidget: Container(
               width: 36.w,
               height: 36.w,
-              decoration: const BoxDecoration(color: Color(0xFFE8F5E9), shape: BoxShape.circle),
-              child: Icon(Icons.check_circle_outline, color: const Color(0xFF43A047), size: 20.sp),
+              decoration: const BoxDecoration(
+                  color: Color(0xFFFFEBEE), shape: BoxShape.circle),
+              child: Icon(Icons.warning_amber_rounded,
+                  color: const Color(0xFFEF5350), size: 20.sp),
             ),
             value: '${c.emergencyCount.value}',
             label: 'Emergency',
@@ -226,8 +344,10 @@ class ProfessionalHomeScreen extends StatelessWidget {
             iconWidget: Container(
               width: 36.w,
               height: 36.w,
-              decoration: const BoxDecoration(color: Color(0xFFE8F5E9), shape: BoxShape.circle),
-              child: Icon(Icons.check_circle_outline, color: const Color(0xFF43A047), size: 20.sp),
+              decoration: const BoxDecoration(
+                  color: Color(0xFFE8F5E9), shape: BoxShape.circle),
+              child: Icon(Icons.check_circle_outline,
+                  color: const Color(0xFF43A047), size: 20.sp),
             ),
             value: '${c.jobsCount.value}',
             label: 'Jobs',
@@ -239,10 +359,12 @@ class ProfessionalHomeScreen extends StatelessWidget {
             iconWidget: Container(
               width: 36.w,
               height: 36.w,
-              decoration: const BoxDecoration(color: Color(0xFFFFF8E1), shape: BoxShape.circle),
-              child: Icon(Icons.star_border, color: const Color(0xFFF8C106), size: 20.sp),
+              decoration: const BoxDecoration(
+                  color: Color(0xFFFFF8E1), shape: BoxShape.circle),
+              child: Icon(Icons.star_border,
+                  color: const Color(0xFFF8C106), size: 20.sp),
             ),
-            value: '${c.rating.value}',
+            value: c.rating.value.toStringAsFixed(1),
             label: 'Rating',
           ),
         ),
@@ -250,14 +372,21 @@ class ProfessionalHomeScreen extends StatelessWidget {
     ));
   }
 
-  Widget _buildStatCard({required Widget iconWidget, required String value, required String label}) {
+  Widget _buildStatCard({
+    required Widget iconWidget,
+    required String value,
+    required String label,
+  }) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -265,9 +394,14 @@ class ProfessionalHomeScreen extends StatelessWidget {
           iconWidget,
           SizedBox(height: 8.h),
           Text(value,
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w800, color: const Color(0xFF212121))),
+              style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF212121))),
           SizedBox(height: 2.h),
-          Text(label, style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
+          Text(label,
+              style:
+              TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
         ],
       ),
     );
@@ -287,7 +421,9 @@ class ProfessionalHomeScreen extends StatelessWidget {
           children: [
             Text(title,
                 style: TextStyle(
-                    fontSize: 16.sp, fontWeight: FontWeight.w800, color: const Color(0xFF212121))),
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF212121))),
             if (badge != null) ...[
               SizedBox(width: 8.w),
               Container(
@@ -300,7 +436,9 @@ class ProfessionalHomeScreen extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(badge,
                     style: TextStyle(
-                        fontSize: 11.sp, fontWeight: FontWeight.w700, color: Colors.white)),
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
               ),
             ],
           ],
@@ -316,7 +454,8 @@ class ProfessionalHomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF1565C0))),
                 SizedBox(width: 2.w),
-                Icon(Icons.chevron_right, color: const Color(0xFF1565C0), size: 16.sp),
+                Icon(Icons.chevron_right,
+                    color: const Color(0xFF1565C0), size: 16.sp),
               ],
             ),
           ),
@@ -325,71 +464,83 @@ class ProfessionalHomeScreen extends StatelessWidget {
   }
 
   // ─────────────────── Active Job Card ───────────────────────────
-  Widget _buildActiveJobCard(ActiveJobModel job, BuildContext context) {
+  Widget _buildActiveJobCard(
+      Map<String, dynamic> job, BuildContext context) {
+    final assetPath = ProfessionalHomeController.assetFromIcon(
+        job['service_icon'] ?? '');
+    final clientName   = job['customer_name'] ?? 'Customer';
+    final address      = job['address'] ?? '';
+    final status       = job['status_display'] ?? job['status'] ?? '';
+
     return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Row(
         children: [
-          Container(
-            width: 48.w,
-            height: 48.w,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF8E1),
-              borderRadius: BorderRadius.circular(12.r),
+          GestureDetector(
+            onTap: () => Get.to(() => const ActiveJobScreen()),
+            child: Container(
+              width: 48.w,
+              height: 48.w,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF8E1),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(8.w),
+                child: Image.asset(assetPath, fit: BoxFit.contain),
+              ),
             ),
-            child: GestureDetector(
-                onTap: (){
-                  Get.to(
-                          () => const ActiveJobScreen());
-                },
-                child: Icon(Icons.ac_unit, color: const Color(0xFF90CAF9), size: 24.sp)),
           ),
           SizedBox(width: 14.w),
           Expanded(
             child: GestureDetector(
-              onTap: (){
-                Get.to(
-                  () => const ActiveJobScreen());
-              },
+              onTap: () => Get.to(() => const ActiveJobScreen()),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(job.clientName,
+                  Text(clientName,
                       style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF212121))),
                   SizedBox(height: 4.h),
-                  Text(job.address,
-                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
+                  Text(address,
+                      style: TextStyle(
+                          fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
                 ],
               ),
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children:[
+            children: [
               GestureDetector(
-                  onTap: () => ReportIssueController.show(context, jobType: 'Plumbing'),
-
-                  child: Icon(Icons.flag_outlined, color: const Color(0xFF9E9E9E), size: 18.sp)
+                onTap: () => ReportIssueController.show(context,
+                    jobType: job['service_name'] ?? 'Service'),
+                child: Icon(Icons.flag_outlined,
+                    color: const Color(0xFF9E9E9E), size: 18.sp),
               ),
               SizedBox(height: 6.h),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                padding:
+                EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE3F2FD),
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
-                  job.status,
+                  status,
                   style: TextStyle(
                     fontSize: 11.sp,
                     fontWeight: FontWeight.w600,
@@ -405,32 +556,43 @@ class ProfessionalHomeScreen extends StatelessWidget {
   }
 
   // ─────────────────── Job Request Card ──────────────────────────
+  Widget _buildJobRequestCard(Map<String, dynamic> request) {
+    final isSold      = request['is_sold'] ?? false;
+    final assetPath   = ProfessionalHomeController.assetFromIcon(
+        request['service_icon'] ?? '');
+    final serviceName = request['service_details']?['name_en'] ??
+        request['service_name'] ?? 'Service';
+    final date        = request['formatted_date'] ?? '';
+    final aiCost      = request['ai_cost'] ?? '—';
+    final address     = request['address'] ?? '';
 
-  Widget _buildJobRequestCard(JobRequestModel request) {
     return Stack(
       children: [
         Container(
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
-            color: request.isSold ? const Color(0xFFF5F5F5) : Colors.white,
+            color: isSold ? const Color(0xFFF5F5F5) : Colors.white,
             borderRadius: BorderRadius.circular(16.r),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2)),
             ],
           ),
           child: Column(
             children: [
               Row(
                 children: [
+                  // Service Icon
                   Image.asset(
-                    request.iconPath,
+                    assetPath,
                     width: 40.w,
                     height: 40.w,
                     fit: BoxFit.contain,
-                    // color: request.isSold ? const Color(0xFFBDBDBD) : null,
-                    colorBlendMode: request.isSold ? BlendMode.saturation : null,
-                    errorBuilder: (_, __, ___) =>
-                        Icon(Icons.water_drop, color: const Color(0xFF64B5F6), size: 36.sp),
+                    colorBlendMode:
+                    isSold ? BlendMode.saturation : null,
+                    color: isSold ? const Color(0xFFBDBDBD) : null,
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
@@ -438,11 +600,11 @@ class ProfessionalHomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          request.service,
+                          serviceName,
                           style: TextStyle(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w700,
-                            color: request.isSold
+                            color: isSold
                                 ? const Color(0xFF9E9E9E)
                                 : const Color(0xFF212121),
                           ),
@@ -451,17 +613,22 @@ class ProfessionalHomeScreen extends StatelessWidget {
                         Row(
                           children: [
                             Icon(Icons.calendar_today_outlined,
-                                size: 12.sp, color: const Color(0xFF9E9E9E)),
+                                size: 12.sp,
+                                color: const Color(0xFF9E9E9E)),
                             SizedBox(width: 4.w),
-                            Text(request.date,
-                                style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
+                            Text(date,
+                                style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: const Color(0xFF9E9E9E))),
                           ],
                         ),
                       ],
                     ),
                   ),
+                  // New badge
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 12.w, vertical: 5.h),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(20.r),
@@ -483,40 +650,57 @@ class ProfessionalHomeScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // AI Cost
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Total',
-                          style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
+                      Text('Est. Cost',
+                          style: TextStyle(
+                              fontSize: 12.sp,
+                              color: const Color(0xFF9E9E9E))),
                       SizedBox(height: 4.h),
                       Text(
-                        request.total,
+                        aiCost,
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,
-                          color: request.isSold
+                          color: isSold
                               ? const Color(0xFF9E9E9E)
                               : const Color(0xFFF8C106),
                         ),
                       ),
                     ],
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text('Distance',
-                          style: TextStyle(fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on_outlined,
-                              size: 14.sp, color: const Color(0xFF9E9E9E)),
-                          SizedBox(width: 2.w),
-                          Text(request.distance,
-                              style: TextStyle(fontSize: 14.sp, color: const Color(0xFF424242))),
-                        ],
-                      ),
-                    ],
+                  // Address
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('Address',
+                            style: TextStyle(
+                                fontSize: 12.sp,
+                                color: const Color(0xFF9E9E9E))),
+                        SizedBox(height: 4.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(Icons.location_on_outlined,
+                                size: 14.sp,
+                                color: const Color(0xFF9E9E9E)),
+                            SizedBox(width: 2.w),
+                            Flexible(
+                              child: Text(
+                                address,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: const Color(0xFF424242)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -524,12 +708,13 @@ class ProfessionalHomeScreen extends StatelessWidget {
           ),
         ),
 
-        // ── "Lead Already Sold" overlay badge ─────────────────────
-        if (request.isSold)
+        // ── Lead Already Sold overlay ──────────────────────────
+        if (isSold)
           Positioned.fill(
             child: Center(
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                padding: EdgeInsets.symmetric(
+                    horizontal: 16.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFF474747),
                   borderRadius: BorderRadius.circular(30.r),
@@ -544,7 +729,8 @@ class ProfessionalHomeScreen extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.info_outline, color: Colors.white, size: 16.sp),
+                    Icon(Icons.info_outline,
+                        color: Colors.white, size: 16.sp),
                     SizedBox(width: 8.w),
                     Text(
                       'Lead Already Sold',
@@ -562,5 +748,4 @@ class ProfessionalHomeScreen extends StatelessWidget {
       ],
     );
   }
-
 }

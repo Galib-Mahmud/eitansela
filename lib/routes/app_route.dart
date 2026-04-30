@@ -24,6 +24,8 @@ import '../feature/customer/screen/service_request.dart';
 import '../feature/professional/screen/Onboardingpages/onboardingscreen.dart';
 import '../feature/professional/screen/activejobscreen.dart';
 import '../feature/professional/screen/eraningpage.dart';
+import '../feature/professional/screen/home/views/professional_home_screen.dart';
+import '../feature/professional/screen/job_request/views/job_requests_screen.dart';
 import '../feature/professional/screen/jobrequestpage.dart';
 import '../feature/professional/screen/profilepage.dart';
 import '../feature/customer/profile/views/profile_screen.dart';
@@ -71,6 +73,8 @@ class AppRoute {
 
     //Professional
     GetPage(name: RouteName.main1, page: () => MainScreen1()),
+    GetPage(name: RouteName.professionalHome, page: () => ProfessionalHomeScreen()),
+    GetPage(name: RouteName.jobRequests, page: () => JobRequestsScreen()),
 
     // Sohan
     GetPage(name: RouteName.homepage, page: () => Homepage()),

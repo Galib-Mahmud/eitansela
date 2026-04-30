@@ -32,4 +32,11 @@ class ApiEndpoint {
   static const String allCustomerRequests = "/services/requests/customer/homepage/";
   static const String notifications       = "/services/notifications/";
 
+
+  //Provider
+
+  static const String proHomepage    = "/services/requests/pro/homepage/";
+  static const String providerProfile = "/services/providers/";
+  static const String proRequests = "/services/requests/pro/requests/";
+
 }

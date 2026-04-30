@@ -32,6 +32,8 @@ class RouteName{
 //Professional
 
   static const String main1 = '/main1';
+  static const String professionalHome = '/professionalHome';
+  static const String jobRequests = '/jobRequests';
 
 
   //Sohan

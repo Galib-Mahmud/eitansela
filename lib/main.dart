@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          initialRoute: RouteName.home,
+          initialRoute: RouteName.jobrequest,
           getPages: AppRoute.pages,
         );
       },

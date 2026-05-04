@@ -1,21 +1,13 @@
-import 'package:eitansela/feature/professional/screen/Onboardingpages/setupservices.dart';
-import 'package:eitansela/feature/professional/screen/Onboardingpages/verifyidentity.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'accrountcreatedonboarding.dart';
-import 'applicationsubmitted.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../../../routes/route_name.dart'; // adjust to your project
+import '../../../../routes/route_name.dart';
+import 'accrountcreatedonboarding.dart';
+import 'applicationsubmitted.dart';
+import 'controller/onboarding_controller.dart';
+import 'setupservices.dart';
+import 'verifyidentity.dart';
 
 class Onboarding extends StatefulWidget {
   const Onboarding({super.key});
@@ -27,6 +19,15 @@ class Onboarding extends StatefulWidget {
 class _OnboardingState extends State<Onboarding> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
+
+  late final OnboardingController _c;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = OnboardingController.to;
+    _c.resetSubmitSuccess();
+  }
 
   @override
   void dispose() {
@@ -53,7 +54,7 @@ class _OnboardingState extends State<Onboarding> {
   }
 
   void _goHome() {
-    Get.toNamed(RouteName.main1);
+    _c.goToSignInAfterOnboarding();
   }
 
   @override
@@ -62,12 +63,34 @@ class _OnboardingState extends State<Onboarding> {
       backgroundColor: const Color(0xFFFFFFFF),
       body: PageView(
         controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(), // disable manual swipe
+        physics: const NeverScrollableScrollPhysics(),
         onPageChanged: (index) => setState(() => _currentStep = index),
         children: [
+          // Step 1: Account Created
           Screen1AccountCreated(onNext: _nextStep),
-          Screen2VerifyIdentity(onNext: _nextStep),
-          Screen3SetupServices(onNext: _nextStep),
+
+          // Step 2: Verify Identity (Document Upload)
+          Screen2VerifyIdentity(
+            onNext: () {
+              // Only move to next step if all documents are uploaded
+              if (_c.validateDocuments()) {
+                _nextStep();
+              }
+            },
+          ),
+
+          // Step 3: Setup Services (API Submission)
+          Screen3SetupServices(
+            onNext: () async {
+              await _c.submitOnboarding();
+              if (_c.onboardingSubmitSuccess) {
+                _c.resetSubmitSuccess();
+                _nextStep();
+              }
+            },
+          ),
+
+          // Step 4: Application Submitted
           Screen4ApplicationSubmitted(onHome: _goHome),
         ],
       ),
@@ -76,7 +99,7 @@ class _OnboardingState extends State<Onboarding> {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// SHARED CONSTANTS & WIDGETS (unchanged)
+// SHARED CONSTANTS & WIDGETS
 // ───────────────────────────────────────────────────────────────────
 
 const kPrimary = Color(0xFFF5A623);
@@ -155,7 +178,14 @@ class StepIndicator extends StatelessWidget {
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
-  const PrimaryButton({super.key, required this.label, required this.onTap});
+  final bool isLoading;
+
+  const PrimaryButton({
+    super.key,
+    required this.label,
+    required this.onTap,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -163,19 +193,29 @@ class PrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: 52.h,
       child: ElevatedButton(
-        onPressed: onTap,
+        onPressed: isLoading ? null : onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: kPrimary,
           foregroundColor: Colors.white,
+          disabledBackgroundColor: kPrimary.withOpacity(0.6),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.r),
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              )
+            : Text(
+                label,
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+              ),
       ),
     );
   }

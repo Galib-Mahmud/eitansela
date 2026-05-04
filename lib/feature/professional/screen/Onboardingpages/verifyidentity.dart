@@ -1,39 +1,19 @@
+// lib/feature/professional/screen/Onboardingpages/verifyidentity.dart
+
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:get/get.dart';
+import 'controller/onboarding_controller.dart';
 import 'onboardingscreen.dart';
-class Screen2VerifyIdentity extends StatefulWidget {
+
+class Screen2VerifyIdentity extends StatelessWidget {
   final VoidCallback onNext;
   const Screen2VerifyIdentity({super.key, required this.onNext});
 
   @override
-  State<Screen2VerifyIdentity> createState() => _Screen2State();
-}
-
-class _Screen2State extends State<Screen2VerifyIdentity> {
-  final List<bool> _uploaded = [false, false, false];
-
-  @override
   Widget build(BuildContext context) {
-    final docs = [
-      {
-        'title': 'Government ID',
-        'subtitle': "Driver's license, Passport, or National ID",
-        'icon': Icons.badge_outlined,
-      },
-      {
-        'title': 'Professional Certificate',
-        'subtitle': 'Trade licenses or relevant certifications',
-        'icon': Icons.workspace_premium_outlined,
-      },
-      {
-        'title': 'Profile Photo',
-        'subtitle': 'Clear Photo of Your face for customers',
-        'icon': Icons.person_outline,
-      },
-    ];
-
-    int uploadedCount = _uploaded.where((v) => v).length;
+    final c = OnboardingController.to;
 
     return BaseScreen(
       step: 1,
@@ -53,64 +33,93 @@ class _Screen2State extends State<Screen2VerifyIdentity> {
             style: TextStyle(fontSize: 14.sp, color: kTextGrey),
           ),
           SizedBox(height: 24.h),
-          ...List.generate(docs.length, (i) {
-            return _DocCard(
-              title: docs[i]['title'] as String,
-              subtitle: docs[i]['subtitle'] as String,
-              icon: docs[i]['icon'] as IconData,
-              uploaded: _uploaded[i],
-              onChoose: () => setState(() => _uploaded[i] = true),
+
+          // Government ID
+          Obx(() => _DocCard(
+            title: 'Government ID',
+            subtitle: "Driver's license, Passport, or National ID",
+            icon: Icons.badge_outlined,
+            file: c.governmentIdFile.value,
+            onChoose: c.pickGovernmentId,
+          )),
+
+          // Professional Certificate
+          Obx(() => _DocCard(
+            title: 'Professional Certificate',
+            subtitle: 'Trade licenses or relevant certifications',
+            icon: Icons.workspace_premium_outlined,
+            file: c.certificateFile.value,
+            onChoose: c.pickCertificate,
+          )),
+
+          // Profile Photo
+          Obx(() => _DocCard(
+            title: 'Profile Photo',
+            subtitle: 'Clear photo of your face for customers',
+            icon: Icons.person_outline,
+            file: c.profilePhotoFile.value,
+            onChoose: c.pickProfilePhoto,
+          )),
+
+          const Spacer(),
+
+          // Progress bar
+          Obx(() {
+            final count = c.uploadedCount;
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    Text('Documents uploaded',
+                        style: TextStyle(color: kTextGrey, fontSize: 13.sp)),
+                    const Spacer(),
+                    Text(
+                      '$count of 3',
+                      style: TextStyle(
+                          color: kTextGrey,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6.h),
+                LinearProgressIndicator(
+                  value: count / 3,
+                  backgroundColor: kBorderGrey,
+                  color: kPrimary,
+                  minHeight: 4.h,
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ],
             );
           }),
-          Spacer(),
-          Row(
-            children: [
-              Text('Documents uploaded',
-                  style: TextStyle(color: kTextGrey, fontSize: 13.sp)),
-              Spacer(),
-              Text(
-                '$uploadedCount of 3',
-                style: TextStyle(
-                    color: kTextGrey,
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-          SizedBox(height: 6.h),
-          LinearProgressIndicator(
-            value: uploadedCount / 3,
-            backgroundColor: kBorderGrey,
-            color: kPrimary,
-            minHeight: 4.h,
-            borderRadius: BorderRadius.circular(2.r),
-          ),
           SizedBox(height: 16.h),
         ],
       ),
-      bottomButton:
-      PrimaryButton(label: 'Continue Setup', onTap: widget.onNext),
+      bottomButton: PrimaryButton(label: 'Continue Setup', onTap: onNext),
     );
   }
 }
 
-
+// ─── Doc Card ─────────────────────────────────────────────────────
 class _DocCard extends StatelessWidget {
-  final String title, subtitle;
+  final String title;
+  final String subtitle;
   final IconData icon;
-  final bool uploaded;
+  final File? file;
   final VoidCallback onChoose;
 
   const _DocCard({
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.uploaded,
+    required this.file,
     required this.onChoose,
   });
 
   @override
   Widget build(BuildContext context) {
+    final uploaded = file != null;
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(14.r),
@@ -121,7 +130,18 @@ class _DocCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: uploaded ? kPrimary : kTextGrey, size: 28.r),
+          // Show thumbnail if it's an image, else icon
+          uploaded
+              ? ClipRRect(
+            borderRadius: BorderRadius.circular(6.r),
+            child: Image.file(
+              file!,
+              width: 36.r,
+              height: 36.r,
+              fit: BoxFit.cover,
+            ),
+          )
+              : Icon(icon, color: kTextGrey, size: 28.r),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
@@ -130,8 +150,16 @@ class _DocCard extends StatelessWidget {
                 Text(title,
                     style: TextStyle(
                         fontWeight: FontWeight.w600, fontSize: 14.sp)),
-                Text(subtitle,
-                    style: TextStyle(fontSize: 12.sp, color: kTextGrey)),
+                Text(
+                  uploaded
+                      ? file!.path.split('/').last
+                      : subtitle,
+                  style: TextStyle(
+                      fontSize: 12.sp,
+                      color: uploaded ? kPrimary : kTextGrey),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
@@ -146,7 +174,7 @@ class _DocCard extends StatelessWidget {
                 ),
                 SizedBox(width: 4.w),
                 Text(
-                  uploaded ? 'Uploaded' : 'Choose',
+                  uploaded ? 'Change' : 'Choose',
                   style: TextStyle(
                       color: kPrimary,
                       fontSize: 13.sp,

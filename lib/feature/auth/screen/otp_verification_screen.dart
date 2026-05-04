@@ -146,29 +146,29 @@ class OtpVerificationScreen extends StatelessWidget {
                 SizedBox(height: 16.h),
 
                 // Timer / Resend row
-                Obx(() => Center(
-                  child: c.canResend.value
-                      ? GestureDetector(
-                    onTap: c.resendOtp,
-                    child: Text(
-                      'Resend Code',
-                      style: TextStyle(
-                        fontFamily: "Inter",
-                        fontSize: 14.sp,
-                        color: const Color(0xFFF8C106),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                      : Text(
-                    'Resend in ${c.otpTimerLabel}',
-                    style: TextStyle(
-                      fontFamily: "Inter",
-                      fontSize: 14.sp,
-                      color: Colors.grey,
-                    ),
-                  ),
-                )),
+                // Obx(() => Center(
+                //   child: c.canResend.value
+                //       ? GestureDetector(
+                //     onTap: c.resendOtp,
+                //     child: Text(
+                //       'Resend Code',
+                //       style: TextStyle(
+                //         fontFamily: "Inter",
+                //         fontSize: 14.sp,
+                //         color: const Color(0xFFF8C106),
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   )
+                //       : Text(
+                //     'Resend in ${c.otpTimerLabel}',
+                //     style: TextStyle(
+                //       fontFamily: "Inter",
+                //       fontSize: 14.sp,
+                //       color: Colors.grey,
+                //     ),
+                //   ),
+                // )),
 
                 SizedBox(height: 30.h),
 

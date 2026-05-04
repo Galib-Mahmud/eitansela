@@ -9,9 +9,6 @@ class RouteName{
   static const String resetPassSucess = '/resetPassSucess';
   static const String otpVerification = '/otpVerification';
   static const String splashScreen = '/splashScreen';
-  static const String onboarding1 = '/onboarding1';
-  static const String onboarding2 = '/onboarding2';
-  static const String onboarding3 = '/onboarding3';
   static const String home = '/home';
   static const String myRequest = '/myRequest';
   static const String recentRequest = '/recentRequest';
@@ -34,6 +31,7 @@ class RouteName{
   static const String main1 = '/main1';
   static const String professionalHome = '/professionalHome';
   static const String jobRequests = '/jobRequests';
+  static const String onboarding1 = '/onboarding1';
 
 
   //Sohan

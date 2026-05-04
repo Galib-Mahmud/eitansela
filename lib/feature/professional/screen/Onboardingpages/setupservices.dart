@@ -1,31 +1,29 @@
+// lib/feature/professional/screen/Onboardingpages/setupservices.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
+import 'controller/onboarding_controller.dart';
 import 'onboardingscreen.dart';
-class Screen3SetupServices extends StatefulWidget {
+
+class Screen3SetupServices extends StatelessWidget {
   final VoidCallback onNext;
-   const Screen3SetupServices({super.key, required this.onNext});
-
-  @override
-  State<Screen3SetupServices> createState() => _Screen3State();
-}
-
-class _Screen3State extends State<Screen3SetupServices> {
-  final Set<String> _selected = {};
-  bool _isHourly = true;
-  double _radius = 15;
-
-  final List<Map<String, dynamic>> _categories = [
-    {'name': 'Plumbing', 'icon': '💧'},
-    {'name': 'Electrical', 'icon': '⚡'},
-    {'name': 'Ac & HVAC', 'icon': '❄️'},
-    {'name': 'Painting', 'icon': '🎨'},
-    {'name': 'Moving', 'icon': '🚚'},
-    {'name': 'Gardening', 'icon': '🌿'},
-  ];
+  const Screen3SetupServices({super.key, required this.onNext});
 
   @override
   Widget build(BuildContext context) {
+    final c = OnboardingController.to;
+
+    final List<Map<String, dynamic>> categories = [
+      {'name': 'Plumbing', 'icon': '💧'},
+      {'name': 'Electrical', 'icon': '⚡'},
+      {'name': 'Ac & HVAC', 'icon': '❄️'},
+      {'name': 'Painting', 'icon': '🎨'},
+      {'name': 'Moving', 'icon': '🚚'},
+      {'name': 'Gardening', 'icon': '🌿'},
+    ];
+
     return BaseScreen(
       step: 2,
       body: SingleChildScrollView(
@@ -42,10 +40,41 @@ class _Screen3State extends State<Screen3SetupServices> {
             ),
             SizedBox(height: 4.h),
             Text(
-              'Tell us what service You offer',
+              'Tell us what service you offer',
               style: TextStyle(fontSize: 14.sp, color: kTextGrey),
             ),
+            SizedBox(height: 16.h),
+
+            // Business Address field
+            Text(
+              'Business Address',
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15.sp,
+                  color: kTextDark),
+            ),
+            SizedBox(height: 8.h),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: kBorderGrey),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: TextField(
+                controller: c.businessAddressController,
+                decoration: InputDecoration(
+                  hintText: 'e.g. Berlin, 123 Main St',
+                  hintStyle: TextStyle(color: kTextGrey, fontSize: 14.sp),
+                  prefixIcon:
+                  Icon(Icons.location_on_outlined, color: kPrimary),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(
+                      vertical: 14.h, horizontal: 12.w),
+                ),
+              ),
+            ),
             SizedBox(height: 20.h),
+
+            // Categories
             Text(
               'Select categories',
               style: TextStyle(
@@ -54,30 +83,25 @@ class _Screen3State extends State<Screen3SetupServices> {
                   color: kTextDark),
             ),
             SizedBox(height: 12.h),
-            GridView.count(
+            Obx(() => GridView.count(
               crossAxisCount: 3,
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               crossAxisSpacing: 10.w,
               mainAxisSpacing: 10.h,
               childAspectRatio: 1.1,
-              children: _categories.map((cat) {
-                final isSelected = _selected.contains(cat['name']);
+              children: categories.map((cat) {
+                final isSelected =
+                c.selectedCategories.contains(cat['name']);
                 return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (isSelected) {
-                        _selected.remove(cat['name']);
-                      } else {
-                        _selected.add(cat['name'] as String);
-                      }
-                    });
-                  },
+                  onTap: () =>
+                      c.toggleCategory(cat['name'] as String),
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                          color: isSelected ? kPrimary : kBorderGrey,
-                          width: isSelected ? 2.w : 1.w),
+                        color: isSelected ? kPrimary : kBorderGrey,
+                        width: isSelected ? 2.w : 1.w,
+                      ),
                       borderRadius: BorderRadius.circular(12.r),
                       color: isSelected ? kPrimaryLight : Colors.white,
                     ),
@@ -94,7 +118,8 @@ class _Screen3State extends State<Screen3SetupServices> {
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
-                            color: isSelected ? kPrimary : kTextDark,
+                            color:
+                            isSelected ? kPrimary : kTextDark,
                           ),
                         ),
                       ],
@@ -102,8 +127,10 @@ class _Screen3State extends State<Screen3SetupServices> {
                   ),
                 );
               }).toList(),
-            ),
+            )),
             SizedBox(height: 20.h),
+
+            // Pricing toggle
             Text(
               'Pricing',
               style: TextStyle(
@@ -112,7 +139,7 @@ class _Screen3State extends State<Screen3SetupServices> {
                   color: kTextDark),
             ),
             SizedBox(height: 10.h),
-            Container(
+            Obx(() => Container(
               decoration: BoxDecoration(
                 border: Border.all(color: kBorderGrey),
                 borderRadius: BorderRadius.circular(12.r),
@@ -123,19 +150,25 @@ class _Screen3State extends State<Screen3SetupServices> {
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => setState(() => _isHourly = true),
+                          onTap: () => c.isHourly.value = true,
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 10.h),
+                            padding:
+                            EdgeInsets.symmetric(vertical: 10.h),
                             margin: EdgeInsets.all(4.w),
                             decoration: BoxDecoration(
-                              color: _isHourly ? kPrimary : Colors.transparent,
-                              borderRadius: BorderRadius.circular(8.r),
+                              color: c.isHourly.value
+                                  ? kPrimary
+                                  : Colors.transparent,
+                              borderRadius:
+                              BorderRadius.circular(8.r),
                             ),
                             alignment: Alignment.center,
                             child: Text(
                               'Hourly Rate',
                               style: TextStyle(
-                                color: _isHourly ? Colors.white : kTextGrey,
+                                color: c.isHourly.value
+                                    ? Colors.white
+                                    : kTextGrey,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14.sp,
                               ),
@@ -145,19 +178,25 @@ class _Screen3State extends State<Screen3SetupServices> {
                       ),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => setState(() => _isHourly = false),
+                          onTap: () => c.isHourly.value = false,
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 10.h),
+                            padding:
+                            EdgeInsets.symmetric(vertical: 10.h),
                             margin: EdgeInsets.all(4.w),
                             decoration: BoxDecoration(
-                              color: !_isHourly ? kPrimary : Colors.transparent,
-                              borderRadius: BorderRadius.circular(8.r),
+                              color: !c.isHourly.value
+                                  ? kPrimary
+                                  : Colors.transparent,
+                              borderRadius:
+                              BorderRadius.circular(8.r),
                             ),
                             alignment: Alignment.center,
                             child: Text(
                               'Price Range',
                               style: TextStyle(
-                                color: !_isHourly ? Colors.white : kTextGrey,
+                                color: !c.isHourly.value
+                                    ? Colors.white
+                                    : kTextGrey,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14.sp,
                               ),
@@ -168,12 +207,13 @@ class _Screen3State extends State<Screen3SetupServices> {
                     ],
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 12.h),
+                    padding:
+                    EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 12.h),
                     child: Container(
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12.w, vertical: 10.h),
                       decoration: BoxDecoration(
-                        color: Color(0xFFF8F8F8),
+                        color: const Color(0xFFF8F8F8),
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Row(
@@ -187,8 +227,9 @@ class _Screen3State extends State<Screen3SetupServices> {
                                   color: kPrimary,
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.w600)),
-                          Spacer(),
-                          Text(_isHourly ? '/hour' : '/job',
+                          const Spacer(),
+                          Text(
+                              c.isHourly.value ? '/hour' : '/job',
                               style: TextStyle(
                                   color: kTextGrey, fontSize: 13.sp)),
                         ],
@@ -197,8 +238,10 @@ class _Screen3State extends State<Screen3SetupServices> {
                   ),
                 ],
               ),
-            ),
+            )),
             SizedBox(height: 20.h),
+
+            // Service Area radius
             Text(
               'Service Area',
               style: TextStyle(
@@ -207,7 +250,7 @@ class _Screen3State extends State<Screen3SetupServices> {
                   color: kTextDark),
             ),
             SizedBox(height: 12.h),
-            Container(
+            Obx(() => Container(
               padding: EdgeInsets.all(14.w),
               decoration: BoxDecoration(
                 border: Border.all(color: kBorderGrey),
@@ -218,15 +261,17 @@ class _Screen3State extends State<Screen3SetupServices> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.location_on_outlined, color: kPrimary, size: 18.sp),
+                      Icon(Icons.location_on_outlined,
+                          color: kPrimary, size: 18.sp),
                       SizedBox(width: 8.w),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Radius: ${_radius.toInt()} Km',
+                            'Radius: ${c.serviceRadius.value.toInt()} Km',
                             style: TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 14.sp),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp),
                           ),
                           Text('Coverage area from your location',
                               style: TextStyle(
@@ -236,31 +281,41 @@ class _Screen3State extends State<Screen3SetupServices> {
                     ],
                   ),
                   Slider(
-                    value: _radius,
+                    value: c.serviceRadius.value,
                     min: 5,
                     max: 50,
                     divisions: 9,
                     activeColor: kPrimary,
                     inactiveColor: kBorderGrey,
-                    onChanged: (v) => setState(() => _radius = v),
+                    onChanged: (v) => c.serviceRadius.value = v,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('5 km', style: TextStyle(fontSize: 11.sp, color: kTextGrey)),
-                      Text('15', style: TextStyle(fontSize: 11.sp, color: kPrimary, fontWeight: FontWeight.bold)),
-                      Text('25 km', style: TextStyle(fontSize: 11.sp, color: kTextGrey)),
-                      Text('50 km', style: TextStyle(fontSize: 11.sp, color: kTextGrey)),
+                      Text('5 km',
+                          style: TextStyle(
+                              fontSize: 11.sp, color: kTextGrey)),
+                      Text('25 km',
+                          style: TextStyle(
+                              fontSize: 11.sp, color: kTextGrey)),
+                      Text('50 km',
+                          style: TextStyle(
+                              fontSize: 11.sp, color: kTextGrey)),
                     ],
                   ),
                 ],
               ),
-            ),
+            )),
             SizedBox(height: 20.h),
           ],
         ),
       ),
-      bottomButton: PrimaryButton(label: 'Submit Application', onTap: widget.onNext),
+      // Button shows spinner while API is in-flight
+      bottomButton: Obx(() => PrimaryButton(
+        label: 'Submit Application',
+        isLoading: c.isLoading.value,
+        onTap: onNext, // onNext calls submitOnboarding() in Onboarding widget
+      )),
     );
   }
 }

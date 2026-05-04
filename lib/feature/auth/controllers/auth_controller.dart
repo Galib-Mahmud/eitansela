@@ -11,9 +11,6 @@ import '../../../core/local_storage/user_info.dart';
 import '../../../routes/route_name.dart';
 
 class AuthController extends GetxController {
-  // ─── permanent: true ──────────────────────────────────────────────
-  // Keeps controller alive across Get.offAllNamed() route clears.
-  // Prevents TextEditingController disposal crash on route rebuild.
   static AuthController get to => Get.put(AuthController(), permanent: true);
 
   final ApiClient _apiClient = ApiClient(baseUrl: ApiEndpoint.baseUrl);
@@ -28,8 +25,7 @@ class AuthController extends GetxController {
   final RxBool canResend = false.obs;
   Timer? _otpTimer;
 
-  // ─── Role Selection ───────────────────────────────────────────────
-  // null = not selected yet; 'PROVIDER' | 'CUSTOMER'
+  // ─── Role Selection (signup screen) ──────────────────────────────
   final Rx<String?> selectedRole = Rx<String?>(null);
 
   // ─── SignUp Controllers ───────────────────────────────────────────
@@ -56,9 +52,21 @@ class AuthController extends GetxController {
 
   // ─── Password Visibility ─────────────────────────────────────────
   final RxBool isPasswordVisible = false.obs;
+  final RxBool isSignUpPasswordVisible = false.obs;
+  final RxBool isSignUpRePasswordVisible = false.obs;
+  final RxBool isNewPasswordVisible = false.obs;
+  final RxBool isReNewPasswordVisible = false.obs;
 
   void togglePasswordVisibility() =>
       isPasswordVisible.value = !isPasswordVisible.value;
+  void toggleSignUpPasswordVisibility() =>
+      isSignUpPasswordVisible.value = !isSignUpPasswordVisible.value;
+  void toggleSignUpRePasswordVisibility() =>
+      isSignUpRePasswordVisible.value = !isSignUpRePasswordVisible.value;
+  void toggleNewPasswordVisibility() =>
+      isNewPasswordVisible.value = !isNewPasswordVisible.value;
+  void toggleReNewPasswordVisibility() =>
+      isReNewPasswordVisible.value = !isReNewPasswordVisible.value;
 
   // ─────────────────────────────────────────────────────────────────
   // OTP TIMER
@@ -84,39 +92,42 @@ class AuthController extends GetxController {
     return '$m:$s';
   }
 
-  final RxBool isSignUpPasswordVisible = false.obs;
-  final RxBool isSignUpRePasswordVisible = false.obs;
-  // In AuthController
-  final isNewPasswordVisible = false.obs;
-  final isReNewPasswordVisible = false.obs;
-
-  void toggleNewPasswordVisibility() =>
-      isNewPasswordVisible.value = !isNewPasswordVisible.value;
-
-  void toggleReNewPasswordVisibility() =>
-      isReNewPasswordVisible.value = !isReNewPasswordVisible.value;
-
-  void toggleSignUpPasswordVisibility() {
-    isSignUpPasswordVisible.value = !isSignUpPasswordVisible.value;
-  }
-
-  void toggleSignUpRePasswordVisibility() {
-    isSignUpRePasswordVisible.value =
-    !isSignUpRePasswordVisible.value;
-  }
-
   // ─────────────────────────────────────────────────────────────────
   // ROLE SELECTION
   // ─────────────────────────────────────────────────────────────────
-  void selectRole(String role) {
-    selectedRole.value = role;
+  void selectRole(String role) => selectedRole.value = role;
+
+  // ─────────────────────────────────────────────────────────────────
+  // ROLE + ONBOARDING BASED NAVIGATION
+  // ─────────────────────────────────────────────────────────────────
+  // Called after login AND from SplashController / main.dart on app open.
+  //
+  // Rules:
+  //   CUSTOMER                           → customerHome (main)
+  //   PROVIDER + onboarding APPROVED     → providerHome (main1)
+  //   PROVIDER + onboarding NOT APPROVED → onboarding screen
+  //   Unknown                            → signin (fallback)
+  // ─────────────────────────────────────────────────────────────────
+  static void navigateByRoleAndOnboarding({
+    required String? role,
+    required String? onboardingStatus,
+  }) {
+    if (role == 'CUSTOMER') {
+      Get.offAllNamed(RouteName.main);
+    } else if (role == 'PROVIDER') {
+      if (onboardingStatus == 'APPROVED') {
+        Get.offAllNamed(RouteName.main1);
+      } else {
+        // PENDING | UNDER_REVIEW | null → must complete onboarding
+        Get.offAllNamed(RouteName.onboarding1);
+      }
+    } else {
+      Get.offAllNamed(RouteName.signin);
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────
   // REGISTER
-  // POST /auth/register/
-  // Body: full_name, email, phone_number, password, re_password, role
-  // Response: user{}, refresh, access, otp_debug, message
   // ─────────────────────────────────────────────────────────────────
   Future<void> register() async {
     if (fullNameController.text.trim().isEmpty ||
@@ -150,16 +161,13 @@ class AuthController extends GetxController {
         },
         requiresAuth: false,
       );
-
-      // Store email for OTP verification step
       await UserInfo.setUserEmail(signUpEmailController.text.trim());
       otpFlowType.value = 'register';
       _clearOtpFields();
       startOtpTimer();
       Get.toNamed(RouteName.otpVerification);
     } on HttpException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? e.message);
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? e.message);
     } catch (e) {
       print('❌ Register error: $e');
       _showError('Something went wrong. Please try again.');
@@ -169,19 +177,16 @@ class AuthController extends GetxController {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // VERIFY OTP (dispatcher)
+  // VERIFY OTP
   // ─────────────────────────────────────────────────────────────────
   Future<void> verifyOtp() async {
     if (otpFlowType.value == 'register') {
       await _verifyRegistrationOtp();
-    } else if (otpFlowType.value == 'forgot_password') {
+    } else {
       await _verifyForgotPasswordOtp();
     }
   }
 
-  // POST /auth/verify-otp/
-  // Body: email, code
-  // Response: message, is_active
   Future<void> _verifyRegistrationOtp() async {
     final code = _getOtpCode();
     if (code.length < 6) {
@@ -200,10 +205,8 @@ class AuthController extends GetxController {
       Get.offAllNamed(RouteName.signin);
       _showSuccess('Account verified! Please sign in.');
     } on HttpException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? e.message);
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? e.message);
     } catch (e) {
-      print('❌ VerifyOTP error: $e');
       _showError('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;
@@ -211,18 +214,17 @@ class AuthController extends GetxController {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // RESEND OTP (dispatcher)
+  // RESEND OTP
   // ─────────────────────────────────────────────────────────────────
   Future<void> resendOtp() async {
     if (!canResend.value) return;
     if (otpFlowType.value == 'register') {
       await _resendRegistrationOtp();
-    } else if (otpFlowType.value == 'forgot_password') {
+    } else {
       await _resendForgotPasswordOtp();
     }
   }
 
-  // POST /auth/forgot-password/ reused for resend registration OTP
   Future<void> _resendRegistrationOtp() async {
     final email = await UserInfo.getUserEmail();
     if (email == null) return;
@@ -236,10 +238,8 @@ class AuthController extends GetxController {
       startOtpTimer();
       _showSuccess('A new code has been sent to your email');
     } on HttpException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? e.message);
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? e.message);
     } catch (e) {
-      print('❌ ResendOTP error: $e');
       _showError('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;
@@ -249,12 +249,10 @@ class AuthController extends GetxController {
   // ─────────────────────────────────────────────────────────────────
   // LOGIN
   // POST /auth/login/
-  // Body: email, password
-  // Response: refresh, access, user{}
+  // Response: refresh, access, user{ role, onboarding_status, ... }
   // ─────────────────────────────────────────────────────────────────
   Future<void> signIn() async {
-    if (emailController.text.trim().isEmpty ||
-        passwordController.text.isEmpty) {
+    if (emailController.text.trim().isEmpty || passwordController.text.isEmpty) {
       _showError('Please enter your email and password');
       return;
     }
@@ -268,19 +266,35 @@ class AuthController extends GetxController {
         },
         requiresAuth: false,
       );
+
       if (response != null) {
+        // ── Save tokens ──────────────────────────────────────────
         await UserInfo.setAccessToken(response['access'] ?? '');
         await UserInfo.setRefreshToken(response['refresh'] ?? '');
+
+        // ── Save role and onboarding_status ──────────────────────
+        final user = response['user'] as Map<String, dynamic>?;
+        final role = user?['role']?.toString() ?? '';
+        final onboardingStatus = user?['onboarding_status']?.toString() ?? '';
+
+        if (role.isNotEmpty) await UserInfo.setRole(role);
+        if (onboardingStatus.isNotEmpty) {
+          await UserInfo.setOnboardingStatus(onboardingStatus);
+        }
+
+        // Flush SharedPreferences before GetX navigates
+        await Future.delayed(Duration.zero);
+
+        // ── Route by role + onboarding status ───────────────────
+        navigateByRoleAndOnboarding(
+          role: role,
+          onboardingStatus: onboardingStatus,
+        );
       }
-      // Flush SharedPreferences before navigating
-      await Future.delayed(Duration.zero);
-      Get.offAllNamed(RouteName.home);
     } on UnauthorizedException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? 'Invalid email or password');
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? 'Invalid email or password');
     } on HttpException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? e.message);
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? e.message);
     } catch (e) {
       print('❌ Login error: $e');
       _showError('Something went wrong. Please try again.');
@@ -291,9 +305,6 @@ class AuthController extends GetxController {
 
   // ─────────────────────────────────────────────────────────────────
   // FORGOT PASSWORD
-  // POST /auth/forgot-password/
-  // Body: email
-  // Response: message
   // ─────────────────────────────────────────────────────────────────
   Future<void> forgotPassword() async {
     if (forgotEmailController.text.trim().isEmpty) {
@@ -313,19 +324,14 @@ class AuthController extends GetxController {
       startOtpTimer();
       Get.toNamed(RouteName.otpVerification);
     } on HttpException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? e.message);
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? e.message);
     } catch (e) {
-      print('❌ ForgotPassword error: $e');
       _showError('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;
     }
   }
 
-  // POST /auth/verify-reset-otp/
-  // Body: email, code
-  // Response: message
   Future<void> _verifyForgotPasswordOtp() async {
     final code = _getOtpCode();
     if (code.length < 6) {
@@ -340,22 +346,18 @@ class AuthController extends GetxController {
         body: {'email': email, 'code': code},
         requiresAuth: false,
       );
-      // Store OTP code — needed in reset-password body
       await UserInfo.setResetToken(code);
       _otpTimer?.cancel();
       Get.toNamed(RouteName.resetPass);
     } on HttpException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? e.message);
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? e.message);
     } catch (e) {
-      print('❌ VerifyForgotOTP error: $e');
       _showError('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;
     }
   }
 
-  // POST /auth/forgot-password/ reused for resend forgot OTP
   Future<void> _resendForgotPasswordOtp() async {
     final email = await UserInfo.getForgotPasswordEmail();
     if (email == null) return;
@@ -369,10 +371,8 @@ class AuthController extends GetxController {
       startOtpTimer();
       _showSuccess('A new code has been sent to your email');
     } on HttpException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? e.message);
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? e.message);
     } catch (e) {
-      print('❌ ResendForgotOTP error: $e');
       _showError('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;
@@ -381,8 +381,6 @@ class AuthController extends GetxController {
 
   // ─────────────────────────────────────────────────────────────────
   // RESET PASSWORD
-  // POST /auth/reset-password/
-  // Body: email, code, new_password, re_new_password
   // ─────────────────────────────────────────────────────────────────
   Future<void> resetPassword() async {
     if (newPasswordController.text.isEmpty ||
@@ -401,7 +399,7 @@ class AuthController extends GetxController {
     isLoading.value = true;
     try {
       final email = await UserInfo.getForgotPasswordEmail();
-      final code = await UserInfo.getResetToken(); // stored OTP code
+      final code = await UserInfo.getResetToken();
       await _apiClient.post(
         ApiEndpoint.resetPassword,
         body: {
@@ -417,10 +415,8 @@ class AuthController extends GetxController {
       _showSuccess('Password reset successfully. Please sign in.');
       Get.offAllNamed(RouteName.resetPassSucess);
     } on HttpException catch (e) {
-      final parsed = _tryParseBody(e.body);
-      _showError(_extractMessage(parsed) ?? e.message);
+      _showError(_extractMessage(_tryParseBody(e.body)) ?? e.message);
     } catch (e) {
-      print('❌ ResetPassword error: $e');
       _showError('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;
@@ -431,23 +427,30 @@ class AuthController extends GetxController {
   // LOGOUT
   // ─────────────────────────────────────────────────────────────────
   Future<void> logout() async {
-    await UserInfo.clearAll();
-    Get.offAllNamed(RouteName.signin);
+    try {
+      final refreshToken = await UserInfo.getRefreshToken();
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        await _apiClient.post(
+          ApiEndpoint.logout,
+          body: {'refresh': refreshToken},
+          requiresAuth: true,
+        );
+      }
+    } catch (e) {
+      print('⚠️ Logout API error (ignored): $e');
+    } finally {
+      await UserInfo.clearAll();
+      Get.offAllNamed(RouteName.signin);
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // NAVIGATION HELPERS  (called from SignInScreen)
+  // NAVIGATION HELPERS
   // ─────────────────────────────────────────────────────────────────
   void goToForgotPassword() => Get.toNamed(RouteName.forgetPass);
   void goToSignUp() => Get.toNamed(RouteName.signup);
-  void continueWithGoogle() {
-    // TODO: implement Google Sign-In
-    _showInfo('Google sign-in coming soon');
-  }
-  void continueWithApple() {
-    // TODO: implement Apple Sign-In
-    _showInfo('Apple sign-in coming soon');
-  }
+  void continueWithGoogle() => _showInfo('Google sign-in coming soon');
+  void continueWithApple() => _showInfo('Apple sign-in coming soon');
 
   // ─────────────────────────────────────────────────────────────────
   // PARSERS
@@ -478,62 +481,44 @@ class AuthController extends GetxController {
   // HELPERS
   // ─────────────────────────────────────────────────────────────────
   String _getOtpCode() => otpControllers.map((c) => c.text).join('');
-
-  void _clearOtpFields() {
-    for (var c in otpControllers) c.clear();
-  }
+  void _clearOtpFields() { for (var c in otpControllers) c.clear(); }
 
   // ─────────────────────────────────────────────────────────────────
   // SNACKBARS
   // ─────────────────────────────────────────────────────────────────
-  void _showError(String message) {
-    Get.snackbar(
-      "Error",
-      message,
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.red.shade700,
-      colorText: Colors.white,
-      icon: const Icon(Icons.error_outline, color: Colors.white),
-      margin: const EdgeInsets.all(12),
-      borderRadius: 10,
-      duration: const Duration(seconds: 5),
-    );
-  }
+  void _showError(String message) => Get.snackbar(
+    "Error", message,
+    snackPosition: SnackPosition.TOP,
+    backgroundColor: Colors.red.shade700,
+    colorText: Colors.white,
+    icon: const Icon(Icons.error_outline, color: Colors.white),
+    margin: const EdgeInsets.all(12),
+    borderRadius: 10,
+    duration: const Duration(seconds: 5),
+  );
 
-  void _showSuccess(String message) {
-    Get.snackbar(
-      "Success",
-      message,
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.green.shade700,
-      colorText: Colors.white,
-      icon: const Icon(Icons.check_circle_outline, color: Colors.white),
-      margin: const EdgeInsets.all(12),
-      borderRadius: 10,
-      duration: const Duration(seconds: 3),
-    );
-  }
+  void _showSuccess(String message) => Get.snackbar(
+    "Success", message,
+    snackPosition: SnackPosition.TOP,
+    backgroundColor: Colors.green.shade700,
+    colorText: Colors.white,
+    icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+    margin: const EdgeInsets.all(12),
+    borderRadius: 10,
+    duration: const Duration(seconds: 3),
+  );
 
-  void _showInfo(String message) {
-    Get.snackbar(
-      "Info",
-      message,
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.blue.shade700,
-      colorText: Colors.white,
-      icon: const Icon(Icons.info_outline, color: Colors.white),
-      margin: const EdgeInsets.all(12),
-      borderRadius: 10,
-      duration: const Duration(seconds: 4),
-    );
-  }
+  void _showInfo(String message) => Get.snackbar(
+    "Info", message,
+    snackPosition: SnackPosition.TOP,
+    backgroundColor: Colors.blue.shade700,
+    colorText: Colors.white,
+    icon: const Icon(Icons.info_outline, color: Colors.white),
+    margin: const EdgeInsets.all(12),
+    borderRadius: 10,
+    duration: const Duration(seconds: 4),
+  );
 
-  // ─────────────────────────────────────────────────────────────────
-  // onClose — only cancel the timer, NEVER dispose TextControllers
-  // ─────────────────────────────────────────────────────────────────
-  // permanent: true keeps this alive for the full app session.
-  // Disposing controllers here would cause "used after dispose" crashes
-  // the next time any auth screen renders.
   @override
   void onClose() {
     _otpTimer?.cancel();

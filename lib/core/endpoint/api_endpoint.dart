@@ -1,42 +1,44 @@
 // lib/core/endpoint/api_endpoint.dart
 
 class ApiEndpoint {
-  // localhost works fine here
   static const String baseUrl = 'https://handyapi.dsrt321.online/api';
-  // static const String baseUrl = "http://127.0.0.1:8000";
 
-  // ─── Auth - Registration ───────────────────────────────────────────
-  static const String register  = "/auth/register/";
-  static const String verifyOtp = "/auth/verify-otp/";
+  // ─── Auth ──────────────────────────────────────────────────────────
+  static const String register       = "/auth/register/";
+  static const String verifyOtp      = "/auth/verify-otp/";
+  static const String login          = "/auth/login/";
+  static const String forgotPassword = "/auth/forgot-password/";
+  static const String verifyResetOtp = "/auth/verify-reset-otp/";
+  static const String resetPassword  = "/auth/reset-password/";
+  static const String profile        = "/auth/profile/";
+  static const String logout         = "/auth/logout/";
 
-  // ─── Auth - Login ──────────────────────────────────────────────────
-  static const String login     = "/auth/login/";
+  // ─── Service Requests ──────────────────────────────────────────────
+  /// POST  body: { service, description, address, zip_code, phone_number, ... }
+  static const String createRequest = "/services/requests/";
 
-  // ─── Auth - Forgot / Reset Password ───────────────────────────────
-  static const String forgotPassword  = "/auth/forgot-password/";
-  static const String verifyResetOtp  = "/auth/verify-reset-otp/";
-  static const String resetPassword   = "/auth/reset-password/";
+  /// POST  multipart: fields={request: id}, files={file: File}
+  static const String uploadMedia   = "/services/media/upload/";
 
-  // ─── Auth - Profile ────────────────────────────────────────────────
-  static const String profile   = "/auth/profile/";
+  /// POST  /services/requests/{id}/send-offer/
+  static String sendOffer(int requestId) =>
+      "/services/requests/$requestId/send-offer/";
 
+  // ─── AI ────────────────────────────────────────────────────────────
+  /// POST  body: { "request_id": N }
+  static const String aiProcess = "/ai/process/";
 
-// AI
-  static const String createRequest = "services/requests/";
-  static const String uploadMedia   = "services/media/upload/";
+  /// GET   /ai/result/{id}/   — poll until is_finished == true
+  static const String aiResult  = "/ai/result/";
 
-
-//Home
-
+  // ─── Home ──────────────────────────────────────────────────────────
   static const String customerHomepage    = "/services/requests/customer/homepage/";
   static const String allCustomerRequests = "/services/requests/customer/homepage/";
   static const String notifications       = "/services/notifications/";
 
-
-  //Provider
-
-  static const String proHomepage    = "/services/requests/pro/homepage/";
-  static const String providerProfile = "/services/providers/";
-  static const String proRequests = "/services/requests/pro/requests/";
-
+  // ─── Provider ──────────────────────────────────────────────────────
+  static const String proHomepage        = "/services/requests/pro/homepage/";
+  static const String providerProfile    = "/services/providers/";
+  static const String proRequests        = "/services/requests/pro/requests/";
+  static const String providerOnboarding = "/pro/onboarding/";
 }

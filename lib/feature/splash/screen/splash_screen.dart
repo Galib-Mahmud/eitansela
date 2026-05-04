@@ -1,7 +1,13 @@
+// lib/feature/splash/screen/splash_screen.dart
+//
+// NOTE: Routing logic is in main.dart (initialRoute).
+// SplashScreen only shows when the user is NOT logged in.
+// It just plays the animation then goes to SignIn.
+
 import 'package:eitansela/routes/route_name.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,36 +26,31 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Initialize animation controller
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
-    // Fade animation
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+      ),
+    );
 
-    // Scale animation
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
 
-    // Start animation
     _animationController.forward();
 
-    // Navigate to onboarding after delay
+    // SplashScreen only mounts when user is NOT logged in (see main.dart).
+    // Always go to SignIn after the animation.
     Future.delayed(const Duration(seconds: 3), () {
-      Get.toNamed(RouteName.signin);
+      if (mounted) Get.offAllNamed(RouteName.signin);
     });
   }
 
@@ -74,40 +75,17 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo - House with wrench icon
-                    Container(
-
-                      child: Image.asset(
-                        'assets/images/splash/onboarding.png', // Your logo asset
-                        fit: BoxFit.cover,
-                      ),
+                    Image.asset(
+                      'assets/images/splash/onboarding.png',
+                      fit: BoxFit.contain,
                     ),
-
                     SizedBox(height: 20.h),
-
-
-
-              
                   ],
                 ),
               ),
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-// Placeholder for OnboardingScreen - replace with your actual onboarding
-class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text('Onboarding Screen'),
       ),
     );
   }

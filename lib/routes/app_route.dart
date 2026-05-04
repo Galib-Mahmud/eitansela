@@ -39,30 +39,18 @@ class AppRoute {
     GetPage(name: RouteName.splash, page: () => SplashScreen()),
 
     GetPage(name: RouteName.signup, page: () => SignUpScreen()),
-    GetPage(
-      name: RouteName.resetPassSucess,
-      page: () => PasswordResetSuccessScreen(),
-    ),
+    GetPage(name: RouteName.resetPassSucess, page: () => PasswordResetSuccessScreen(),),
     GetPage(name: RouteName.resetPass, page: () => PasswordResetScreen()),
-    GetPage(
-      name: RouteName.otpVerification,
-      page: () => OtpVerificationScreen(),
-    ),
+    GetPage(name: RouteName.otpVerification, page: () => OtpVerificationScreen(),),
     GetPage(name: RouteName.forgetPass, page: () => ForgotPasswordScreen()),
     GetPage(name: RouteName.splashScreen, page: () => SplashScreen()),
-    GetPage(name: RouteName.onboarding1, page: () => Onboarding1Screen()),
-    GetPage(name: RouteName.onboarding2, page: () => Onboarding2Screen()),
-    GetPage(name: RouteName.onboarding3, page: () => Onboarding3Screen()),
     GetPage(name: RouteName.home, page: () => HomeDashboardScreen()),
     GetPage(name: RouteName.myRequest, page: () => MyRequest()),
     GetPage(name: RouteName.main, page: () => MainScreen()),
     GetPage(name: RouteName.profile, page: () => ProfileScreen()),
     GetPage(name: RouteName.savedAddresses, page: () => SavedAddressesScreen()),
     GetPage(name: RouteName.newRequest, page: () => NewRequestScreen()),
-    GetPage(
-      name: RouteName.newRequestAnalysis,
-      page: () => NewRequestAnalysisScreen(),
-    ),
+    GetPage(name: RouteName.newRequestAnalysis, page: () => NewRequestAnalysisScreen(),),
     GetPage(name: RouteName.newRequestScreen1, page: () => NewRequestScreen1()),
     GetPage(name: RouteName.professional, page: () => ProfessionalScreen()),
     GetPage(name: RouteName.chat, page: () => ProfessionalChatScreen()),
@@ -73,6 +61,7 @@ class AppRoute {
 
     //Professional
     GetPage(name: RouteName.main1, page: () => MainScreen1()),
+    GetPage(name: RouteName.onboarding1, page: () => Onboarding()),
     GetPage(name: RouteName.professionalHome, page: () => ProfessionalHomeScreen()),
     GetPage(name: RouteName.jobRequests, page: () => JobRequestsScreen()),
 

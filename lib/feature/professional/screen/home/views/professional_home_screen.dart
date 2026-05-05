@@ -22,7 +22,8 @@ class ProfessionalHomeScreen extends StatelessWidget {
         child: Obx(() {
           if (c.isLoading.value &&
               c.activeJobs.isEmpty &&
-              c.newRequests.isEmpty) {
+              c.newRequests.isEmpty &&
+              c.emergencyRequests.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(color: Color(0xFFF8C106)),
             );
@@ -30,10 +31,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
 
           return RefreshIndicator(
             color: const Color(0xFFF8C106),
-            onRefresh: () async {
-              await c.fetchProfile();
-              await c.fetchHomepage();
-            },
+            onRefresh: c.fetchHomepage,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -67,11 +65,12 @@ class ProfessionalHomeScreen extends StatelessWidget {
                   SizedBox(height: 20.h),
 
                   // ── Emergency Requests ───────────────────────────
-                  _buildSectionHeader(
+                  Obx(() => _buildSectionHeader(
                     title: 'Emergency Request',
-                    showViewAll: true,
+                    badge: c.emergencyRequests.length.toString(),
+                    showViewAll: c.emergencyRequests.isNotEmpty,
                     onViewAll: () {},
-                  ),
+                  )),
                   SizedBox(height: 10.h),
                   Obx(() {
                     if (c.emergencyRequests.isEmpty) {
@@ -90,11 +89,12 @@ class ProfessionalHomeScreen extends StatelessWidget {
                   SizedBox(height: 8.h),
 
                   // ── New Requests ─────────────────────────────────
-                  _buildSectionHeader(
+                  Obx(() => _buildSectionHeader(
                     title: 'New Requests',
-                    showViewAll: true,
+                    badge: c.newRequests.length.toString(),
+                    showViewAll: c.newRequests.isNotEmpty,
                     onViewAll: () {},
-                  ),
+                  )),
                   SizedBox(height: 10.h),
                   Obx(() {
                     if (c.newRequests.isEmpty) {
@@ -119,6 +119,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
                     children: [
                       _buildSectionHeader(
                         title: 'Private Requests',
+                        badge: c.privateRequests.length.toString(),
                         showViewAll: true,
                         onViewAll: () {},
                       ),
@@ -162,6 +163,8 @@ class ProfessionalHomeScreen extends StatelessWidget {
   }
 
   // ─────────────────── Profile Card ──────────────────────────────
+  // Now reads professionalName, professionalImage from the controller,
+  // which are populated by response['profile'] in fetchHomepage()
   Widget _buildProfileCard(ProfessionalHomeController c) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
@@ -195,7 +198,9 @@ class ProfessionalHomeScreen extends StatelessWidget {
           }),
           SizedBox(width: 14.w),
 
-          // ── Name + Role ────────────────────────────────────────
+          // ── Name + Email ───────────────────────────────────────
+          // Role/category is not in homepage response, so we show
+          // email as subtitle (matches the profile JSON structure)
           Expanded(
             child: Obx(() => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,13 +217,39 @@ class ProfessionalHomeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 3.h),
                 Text(
-                  c.professionalRole.value,
+                  c.professionalEmail.value.isNotEmpty
+                      ? c.professionalEmail.value
+                      : 'Professional',
                   style: TextStyle(
                       fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
                 ),
               ],
             )),
           ),
+
+          // ── Verified Badge ─────────────────────────────────────
+          Obx(() => c.isVerified.value
+              ? Container(
+            margin: EdgeInsets.only(right: 8.w),
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F5E9),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.verified,
+                    color: const Color(0xFF43A047), size: 12.sp),
+                SizedBox(width: 3.w),
+                Text('Verified',
+                    style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF43A047))),
+              ],
+            ),
+          )
+              : const SizedBox.shrink()),
 
           // ── Notification Bell ──────────────────────────────────
           GestureDetector(
@@ -424,11 +455,12 @@ class ProfessionalHomeScreen extends StatelessWidget {
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFF212121))),
-            if (badge != null) ...[
+            if (badge != null && badge != '0') ...[
               SizedBox(width: 8.w),
               Container(
-                width: 22.w,
+                constraints: BoxConstraints(minWidth: 22.w),
                 height: 22.w,
+                padding: EdgeInsets.symmetric(horizontal: 6.w),
                 decoration: const BoxDecoration(
                   color: Color(0xFFF8C106),
                   shape: BoxShape.circle,
@@ -464,13 +496,11 @@ class ProfessionalHomeScreen extends StatelessWidget {
   }
 
   // ─────────────────── Active Job Card ───────────────────────────
-  Widget _buildActiveJobCard(
-      Map<String, dynamic> job, BuildContext context) {
-    final assetPath = ProfessionalHomeController.assetFromIcon(
-        job['service_icon'] ?? '');
-    final clientName   = job['customer_name'] ?? 'Customer';
-    final address      = job['address'] ?? '';
-    final status       = job['status_display'] ?? job['status'] ?? '';
+  Widget _buildActiveJobCard(Map<String, dynamic> job, BuildContext context) {
+    final assetPath  = ProfessionalHomeController.assetFromIcon(job['service_icon'] ?? '');
+    final clientName = job['customer_name'] ?? 'Customer';
+    final address    = job['address'] ?? '';
+    final status     = job['status_display'] ?? job['status'] ?? '';
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
@@ -533,8 +563,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
               ),
               SizedBox(height: 6.h),
               Container(
-                padding:
-                EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE3F2FD),
                   borderRadius: BorderRadius.circular(20.r),
@@ -558,13 +587,14 @@ class ProfessionalHomeScreen extends StatelessWidget {
   // ─────────────────── Job Request Card ──────────────────────────
   Widget _buildJobRequestCard(Map<String, dynamic> request) {
     final isSold      = request['is_sold'] ?? false;
-    final assetPath   = ProfessionalHomeController.assetFromIcon(
-        request['service_icon'] ?? '');
+    final assetPath   = ProfessionalHomeController.assetFromIcon(request['service_icon'] ?? '');
     final serviceName = request['service_details']?['name_en'] ??
         request['service_name'] ?? 'Service';
     final date        = request['formatted_date'] ?? '';
-    final aiCost      = request['ai_cost'] ?? '—';
+    // ai_cost is already a formatted String after _normalizeRequest in controller
+    final aiCost      = (request['ai_cost'] as String?) ?? '—';
     final address     = request['address'] ?? '';
+    final isPriority  = request['mark_as_priority'] ?? false;
 
     return Stack(
       children: [
@@ -573,6 +603,9 @@ class ProfessionalHomeScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSold ? const Color(0xFFF5F5F5) : Colors.white,
             borderRadius: BorderRadius.circular(16.r),
+            border: isPriority && !isSold
+                ? Border.all(color: const Color(0xFFEF5350).withOpacity(0.4))
+                : null,
             boxShadow: [
               BoxShadow(
                   color: Colors.black.withOpacity(0.04),
@@ -584,14 +617,12 @@ class ProfessionalHomeScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  // Service Icon
                   Image.asset(
                     assetPath,
                     width: 40.w,
                     height: 40.w,
                     fit: BoxFit.contain,
-                    colorBlendMode:
-                    isSold ? BlendMode.saturation : null,
+                    colorBlendMode: isSold ? BlendMode.saturation : null,
                     color: isSold ? const Color(0xFFBDBDBD) : null,
                   ),
                   SizedBox(width: 12.w),
@@ -613,8 +644,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
                         Row(
                           children: [
                             Icon(Icons.calendar_today_outlined,
-                                size: 12.sp,
-                                color: const Color(0xFF9E9E9E)),
+                                size: 12.sp, color: const Color(0xFF9E9E9E)),
                             SizedBox(width: 4.w),
                             Text(date,
                                 style: TextStyle(
@@ -625,20 +655,23 @@ class ProfessionalHomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // New badge
+                  // Priority or New badge
                   Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 12.w, vertical: 5.h),
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE8F5E9),
+                      color: isPriority
+                          ? const Color(0xFFFFEBEE)
+                          : const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Text(
-                      'New',
+                      isPriority ? 'Priority' : 'New',
                       style: TextStyle(
                         fontSize: 11.sp,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF43A047),
+                        color: isPriority
+                            ? const Color(0xFFEF5350)
+                            : const Color(0xFF43A047),
                       ),
                     ),
                   ),
@@ -650,7 +683,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // AI Cost
+                  // AI Cost — already formatted string e.g. "EUR 160 – 380"
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -662,7 +695,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
                       Text(
                         aiCost,
                         style: TextStyle(
-                          fontSize: 15.sp,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w700,
                           color: isSold
                               ? const Color(0xFF9E9E9E)
@@ -685,8 +718,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Icon(Icons.location_on_outlined,
-                                size: 14.sp,
-                                color: const Color(0xFF9E9E9E)),
+                                size: 14.sp, color: const Color(0xFF9E9E9E)),
                             SizedBox(width: 2.w),
                             Flexible(
                               child: Text(
@@ -713,8 +745,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
           Positioned.fill(
             child: Center(
               child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 16.w, vertical: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFF474747),
                   borderRadius: BorderRadius.circular(30.r),
@@ -729,8 +760,7 @@ class ProfessionalHomeScreen extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.info_outline,
-                        color: Colors.white, size: 16.sp),
+                    Icon(Icons.info_outline, color: Colors.white, size: 16.sp),
                     SizedBox(width: 8.w),
                     Text(
                       'Lead Already Sold',

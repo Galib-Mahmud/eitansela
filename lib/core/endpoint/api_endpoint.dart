@@ -41,4 +41,8 @@ class ApiEndpoint {
   static const String providerProfile    = "/services/providers/";
   static const String proRequests        = "/services/requests/pro/requests/";
   static const String providerOnboarding = "/pro/onboarding/";
+  static const String activateSubscription = "/pro/subscription/activate/";
+  static String proRequestRespond(int id)  => '/services/requests/$id/respond/';
+  static String proAdvanceStatus(int id)   => '/services/requests/$id/advance-status/';
+  static String proSubmitBill(int id)      => '/services/requests/$id/submit-bill/';
 }

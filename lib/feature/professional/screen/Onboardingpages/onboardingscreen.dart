@@ -53,8 +53,9 @@ class _OnboardingState extends State<Onboarding> {
     }
   }
 
-  void _goHome() {
-    _c.goToSignInAfterOnboarding();
+  // Step 4 button → Subscription screen
+  void _goToSubscription() {
+    Get.toNamed(RouteName.subscription);
   }
 
   @override
@@ -72,10 +73,7 @@ class _OnboardingState extends State<Onboarding> {
           // Step 2: Verify Identity (Document Upload)
           Screen2VerifyIdentity(
             onNext: () {
-              // Only move to next step if all documents are uploaded
-              if (_c.validateDocuments()) {
-                _nextStep();
-              }
+              if (_c.validateDocuments()) _nextStep();
             },
           ),
 
@@ -90,8 +88,8 @@ class _OnboardingState extends State<Onboarding> {
             },
           ),
 
-          // Step 4: Application Submitted
-          Screen4ApplicationSubmitted(onHome: _goHome),
+          // Step 4: Application Submitted → goes to Subscription
+          Screen4ApplicationSubmitted(onHome: _goToSubscription),
         ],
       ),
     );
@@ -102,11 +100,11 @@ class _OnboardingState extends State<Onboarding> {
 // SHARED CONSTANTS & WIDGETS
 // ───────────────────────────────────────────────────────────────────
 
-const kPrimary = Color(0xFFF5A623);
+const kPrimary      = Color(0xFFF5A623);
 const kPrimaryLight = Color(0xFFFFF3DC);
-const kTextDark = Color(0xFF1A1A1A);
-const kTextGrey = Color(0xFF888888);
-const kBorderGrey = Color(0xFFE0E0E0);
+const kTextDark     = Color(0xFF1A1A1A);
+const kTextGrey     = Color(0xFF888888);
+const kBorderGrey   = Color(0xFFE0E0E0);
 
 class StepIndicator extends StatelessWidget {
   final int currentStep;
@@ -163,7 +161,8 @@ class StepIndicator extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11.sp,
                     color: isActive ? kPrimary : kTextGrey,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                    isActive ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
               ],
@@ -205,17 +204,16 @@ class PrimaryButton extends StatelessWidget {
         ),
         child: isLoading
             ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.5,
-                ),
-              )
+          width: 22,
+          height: 22,
+          child: CircularProgressIndicator(
+              color: Colors.white, strokeWidth: 2.5),
+        )
             : Text(
-                label,
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-              ),
+          label,
+          style: TextStyle(
+              fontSize: 16.sp, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }

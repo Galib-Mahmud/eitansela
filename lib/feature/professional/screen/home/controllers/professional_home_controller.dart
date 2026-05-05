@@ -2,7 +2,6 @@
 
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/endpoint/api_client.dart';
@@ -17,9 +16,14 @@ class ProfessionalHomeController extends GetxController {
   final RxBool isOnline  = false.obs;
 
   // ── Profile ───────────────────────────────────────────────────────
+  // All sourced from response['profile'] inside /services/requests/pro/homepage/
   final RxString professionalName  = ''.obs;
   final RxString professionalImage = ''.obs;
-  final RxString professionalRole  = 'Professional'.obs;
+  final RxString professionalEmail = ''.obs;
+  final RxString professionalBio   = ''.obs;
+  final RxBool   isVerified        = false.obs;
+  final RxBool   isAvailable       = false.obs;
+  final RxInt    certificates      = 0.obs;
 
   // ── Stats ─────────────────────────────────────────────────────────
   final RxInt    emergencyCount = 0.obs;
@@ -35,76 +39,70 @@ class ProfessionalHomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchProfile();
-    fetchHomepage();
+    fetchHomepage(); // single call — profile is embedded inside this response
   }
 
-  // ── Fetch Profile ─────────────────────────────────────────────────
-  Future<void> fetchProfile() async {
-    try {
-      print('👤 [PRO PROFILE] Fetching...');
-
-      final response = await _apiClient.get(ApiEndpoint.providerProfile);
-
-      print('✅ [PRO PROFILE] Response: $response');
-
-      // Response is a list, take first item
-      if (response is List && response.isNotEmpty) {
-        final profile = Map<String, dynamic>.from(response[0]);
-
-        professionalName.value  = profile['full_name'] ?? 'Professional';
-        professionalImage.value = profile['profile_photo'] ?? '';
-        professionalRole.value  = profile['category_name'] ?? 'Professional';
-
-        // Use rating from profile if available
-        final profileRating = double.tryParse(profile['rating']?.toString() ?? '0') ?? 0.0;
-        if (profileRating > 0) rating.value = profileRating;
-
-        print('👤 Name  : ${professionalName.value}');
-        print('📸 Photo : ${professionalImage.value}');
-      }
-
-    } on HttpException catch (e) {
-      print('❌ [PRO PROFILE] HttpException: ${e.message}');
-    } catch (e) {
-      print('❌ [PRO PROFILE] Error: $e');
-    }
-  }
-
-  // ── Fetch Homepage ────────────────────────────────────────────────
+  // ── Fetch Homepage (profile + stats + lists) ──────────────────────
   Future<void> fetchHomepage() async {
     try {
       isLoading.value = true;
 
-      print('🏠 [PRO HOME] Fetching...');
+      print('🏠 [PRO HOME] Fetching /services/requests/pro/homepage/ ...');
 
       final response = await _apiClient.get(ApiEndpoint.proHomepage);
 
-      print('✅ [PRO HOME] Response: $response');
+      print('✅ [PRO HOME] Response received');
 
-      // ── Online status ────────────────────────────────────────────
+      // ── Profile block ─────────────────────────────────────────────
+      // JSON shape:
+      // "profile": { "full_name", "email", "photo", "bio",
+      //              "emergency_count", "jobs_count", "rating",
+      //              "certificates", "is_verified", "is_available" }
+      final profile = (response['profile'] as Map?)?.cast<String, dynamic>() ?? {};
+
+      professionalName.value  = profile['full_name']    ?? 'Professional';
+      professionalEmail.value = profile['email']         ?? '';
+      professionalBio.value   = profile['bio']           ?? '';
+      isVerified.value        = profile['is_verified']   ?? false;
+      isAvailable.value       = profile['is_available']  ?? false;
+      certificates.value      = profile['certificates']  ?? 0;
+
+      // photo is a relative path like "/media/providers/photos/..."
+      // prepend base URL so Image.network can load it correctly
+      final rawPhoto = (profile['photo'] as String?) ?? '';
+      professionalImage.value = rawPhoto.isNotEmpty
+          ? '${ApiEndpoint.baseUrl}$rawPhoto'
+          : '';
+
+      final profileRating =
+          double.tryParse(profile['rating']?.toString() ?? '0') ?? 0.0;
+
+      print('👤 Name  : ${professionalName.value}');
+      print('📸 Photo : ${professionalImage.value}');
+      print('✉️  Email : ${professionalEmail.value}');
+
+      // ── Online status ─────────────────────────────────────────────
       isOnline.value = response['is_online'] ?? false;
 
-      // ── Stats ────────────────────────────────────────────────────
-      final stats = response['stats'] ?? {};
-      emergencyCount.value = stats['emergency_count'] ?? 0;
-      jobsCount.value      = stats['active_jobs_count'] ?? 0;
-      final apiRating      = double.tryParse(stats['rating']?.toString() ?? '0') ?? 0.0;
-      if (apiRating > 0) rating.value = apiRating;
+      // ── Stats block ───────────────────────────────────────────────
+      // JSON shape: "stats": { "emergency_count", "active_jobs_count", "rating" }
+      // Falls back to profile-level counts if stats are missing
+      final stats = (response['stats'] as Map?)?.cast<String, dynamic>() ?? {};
 
-      // ── Lists ────────────────────────────────────────────────────
-      activeJobs.value = List<Map<String, dynamic>>.from(
-        (response['active_jobs'] ?? []).map((e) => Map<String, dynamic>.from(e)),
-      );
-      emergencyRequests.value = List<Map<String, dynamic>>.from(
-        (response['emergency_requests'] ?? []).map((e) => Map<String, dynamic>.from(e)),
-      );
-      newRequests.value = List<Map<String, dynamic>>.from(
-        (response['new_requests'] ?? []).map((e) => Map<String, dynamic>.from(e)),
-      );
-      privateRequests.value = List<Map<String, dynamic>>.from(
-        (response['private_requests'] ?? []).map((e) => Map<String, dynamic>.from(e)),
-      );
+      emergencyCount.value = stats['emergency_count']  ?? profile['emergency_count'] ?? 0;
+      jobsCount.value      = stats['active_jobs_count'] ?? profile['jobs_count']      ?? 0;
+
+      final statsRating =
+          double.tryParse(stats['rating']?.toString() ?? '0') ?? 0.0;
+      // prefer stats rating; fall back to profile rating
+      rating.value = statsRating > 0 ? statsRating : profileRating;
+
+      // ── Request lists ─────────────────────────────────────────────
+      // _normalizeRequest converts ai_cost Map → formatted String
+      activeJobs.value = _parseList(response['active_jobs']);
+      emergencyRequests.value = _parseList(response['emergency_requests']);
+      newRequests.value = _parseList(response['new_requests']);
+      privateRequests.value = _parseList(response['private_requests']);
 
       print('🔧 Active Jobs        : ${activeJobs.length}');
       print('🚨 Emergency Requests : ${emergencyRequests.length}');
@@ -120,6 +118,41 @@ class ProfessionalHomeController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  // ── Parse a raw list from the API response ────────────────────────
+  List<Map<String, dynamic>> _parseList(dynamic raw) {
+    if (raw == null) return [];
+    return List<Map<String, dynamic>>.from(
+      (raw as List).map((e) => _normalizeRequest(e)),
+    );
+  }
+
+  // ── Normalize a single request map ───────────────────────────────
+  /// Converts ai_cost from Map → pre-formatted String so the UI never
+  /// gets a Map where it expects a String.
+  /// Prevents: type '_Map<String, dynamic>' is not a subtype of type 'String'
+  Map<String, dynamic> _normalizeRequest(dynamic raw) {
+    final map = Map<String, dynamic>.from(raw as Map);
+    map['ai_cost'] = _formatAiCost(map['ai_cost']);
+    return map;
+  }
+
+  // ── Format ai_cost object → display string ────────────────────────
+  /// API sends: { "min": 160, "max": 380, "currency": "EUR" }
+  /// Result   : "EUR 160 – 380"
+  static String _formatAiCost(dynamic aiCost) {
+    if (aiCost == null) return '—';
+    if (aiCost is String) return aiCost.isNotEmpty ? aiCost : '—';
+    if (aiCost is Map) {
+      final min      = aiCost['min'];
+      final max      = aiCost['max'];
+      final currency = aiCost['currency'] ?? '';
+      if (min != null && max != null) return '$currency $min – $max';
+      if (min != null) return '$currency $min';
+      if (max != null) return '$currency $max';
+    }
+    return '—';
   }
 
   // ── Toggle Online ─────────────────────────────────────────────────

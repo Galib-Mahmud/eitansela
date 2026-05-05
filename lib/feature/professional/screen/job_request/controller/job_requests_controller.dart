@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import '../../../../../core/endpoint/api_client.dart';
 import '../../../../../core/endpoint/api_endpoint.dart';
-
+import '../../activejobscreen.dart';
 
 class JobRequestsController extends GetxController {
   final ApiClient _apiClient = ApiClient(baseUrl: ApiEndpoint.baseUrl);
@@ -13,16 +13,10 @@ class JobRequestsController extends GetxController {
   // ── Observables ───────────────────────────────────────────────────
   final RxBool isLoading = false.obs;
 
-  final RxList<Map<String, dynamic>> activeAndCompleted = <Map<String, dynamic>>[].obs;
-  final RxList<Map<String, dynamic>> newLeads           = <Map<String, dynamic>>[].obs;
-
-  // Combined list for display (active/completed first, then new leads)
-  RxList<Map<String, dynamic>> get requests {
-    return <Map<String, dynamic>>[
-      ...activeAndCompleted,
-      ...newLeads,
-    ].obs;
-  }
+  final RxList<Map<String, dynamic>> activeAndCompleted =
+      <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> newLeads =
+      <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
@@ -34,24 +28,17 @@ class JobRequestsController extends GetxController {
   Future<void> fetchRequests() async {
     try {
       isLoading.value = true;
-
       print('📋 [PRO REQUESTS] Fetching...');
 
       final response = await _apiClient.get(ApiEndpoint.proRequests);
 
-      print('✅ [PRO REQUESTS] Response: $response');
+      print('✅ [PRO REQUESTS] Response received');
 
-      activeAndCompleted.value = List<Map<String, dynamic>>.from(
-        (response['active_and_completed'] ?? []).map((e) => Map<String, dynamic>.from(e)),
-      );
-
-      newLeads.value = List<Map<String, dynamic>>.from(
-        (response['new_leads'] ?? []).map((e) => Map<String, dynamic>.from(e)),
-      );
+      activeAndCompleted.value = _parseList(response['active_and_completed']);
+      newLeads.value = _parseList(response['new_leads']);
 
       print('🔧 Active/Completed : ${activeAndCompleted.length}');
       print('🆕 New Leads        : ${newLeads.length}');
-
     } on HttpException catch (e) {
       print('❌ [PRO REQUESTS] HttpException: ${e.message}');
       Get.snackbar('Error', e.message);
@@ -63,25 +50,75 @@ class JobRequestsController extends GetxController {
     }
   }
 
-  // ── Accept Request ────────────────────────────────────────────────
+  // ── Parse raw list ────────────────────────────────────────────────
+  List<Map<String, dynamic>> _parseList(dynamic raw) {
+    if (raw == null) return [];
+    return List<Map<String, dynamic>>.from(
+      (raw as List).map((e) => Map<String, dynamic>.from(e as Map)),
+    );
+  }
+
+  // ── Format ai_cost for display only (used in the card UI) ─────────
+  /// API: { "min": 160, "max": 380, "currency": "EUR" }  →  "EUR 160 – 380"
+  static String formatAiCost(dynamic aiCost) {
+    if (aiCost == null) return '—';
+    if (aiCost is String) return aiCost.isNotEmpty ? aiCost : '—';
+    if (aiCost is Map) {
+      final min = aiCost['min'];
+      final max = aiCost['max'];
+      final currency = aiCost['currency'] ?? '';
+      if (min != null && max != null) return '$currency $min – $max';
+      if (min != null) return '$currency $min';
+      if (max != null) return '$currency $max';
+    }
+    return '—';
+  }
+
+  // ── Accept Request → navigate to ActiveJobScreen ──────────────────
   Future<void> acceptRequest(int requestId) async {
     try {
-      print('✅ [ACCEPT] Request ID: $requestId');
+      // Find the full request object (un-normalised — keep ai_cost as Map)
+      final requestData = newLeads.firstWhere(
+            (r) => r['id'] == requestId,
+        orElse: () => {},
+      );
 
-      // TODO: call accept API when endpoint is available
-      // await _apiClient.post('/services/requests/$requestId/accept/');
+      if (requestData.isEmpty) {
+        Get.snackbar('Error', 'Could not find lead details');
+        return;
+      }
 
-      // Remove from newLeads locally
+      // Optimistic remove from list
       newLeads.removeWhere((r) => r['id'] == requestId);
 
-      Get.snackbar('Success', 'Request accepted!');
-      print('✅ [ACCEPT] Done');
-
-    } on HttpException catch (e) {
-      print('❌ [ACCEPT] Error: ${e.message}');
-      Get.snackbar('Error', e.message);
+      // Pass the FULL raw request so ActiveJobController can read everything
+      Get.to(
+            () => const ActiveJobScreen(),
+        arguments: {
+          'jobId': requestId,
+          // ── Flat fields ──────────────────────────────────────────
+          'customer_name': requestData['customer_name'],
+          'address': requestData['address'],
+          'customer_photo': requestData['customer_photo'],
+          'service_name': requestData['service_name'],       // may be ""
+          'service_icon': requestData['service_icon'],
+          // ── Nested service details (for name fallback) ───────────
+          'service_details': requestData['service_details'], // Map
+          // ── AI cost — pass the full Map so controller can unpack ──
+          'ai_cost': requestData['ai_cost'],                 // Map {min, max, currency}
+          // ── Priority / chat flags ─────────────────────────────────
+          'mark_as_priority': requestData['mark_as_priority'] ?? false,
+          'no_call_just_chat': requestData['no_call_just_chat'] ?? false,
+          // ── Status ────────────────────────────────────────────────
+          'status': 'CONFIRMED',
+          'status_display': 'Confirmed',
+          // ── Timeline ──────────────────────────────────────────────
+          'timeline': requestData['timeline'] ?? {},
+        },
+      );
     } catch (e) {
-      print('❌ [ACCEPT] Error: $e');
+      print('❌ [ACCEPT ERROR] $e');
+      Get.snackbar('Error', 'Could not open job screen.');
     }
   }
 
@@ -89,18 +126,9 @@ class JobRequestsController extends GetxController {
   Future<void> declineRequest(int requestId) async {
     try {
       print('❌ [DECLINE] Request ID: $requestId');
-
-      // TODO: call decline API when endpoint is available
-      // await _apiClient.post('/services/requests/$requestId/decline/');
-
-      // Remove from newLeads locally
       newLeads.removeWhere((r) => r['id'] == requestId);
-
       Get.snackbar('Declined', 'Request declined.');
-      print('✅ [DECLINE] Done');
-
     } on HttpException catch (e) {
-      print('❌ [DECLINE] Error: ${e.message}');
       Get.snackbar('Error', e.message);
     } catch (e) {
       print('❌ [DECLINE] Error: $e');
@@ -110,12 +138,12 @@ class JobRequestsController extends GetxController {
   // ── Helper: icon string → asset path ─────────────────────────────
   static String assetFromIcon(String icon) {
     const map = {
-      'water_drop'     : 'assets/images/profile/water.png',
-      'bolt'           : 'assets/images/profile/2.png',
-      'ac_unit'        : 'assets/images/profile/3.png',
-      'palette'        : 'assets/images/profile/7.png',
-      'local_shipping' : 'assets/images/profile/8.png',
-      'eco'            : 'assets/images/profile/12.png',
+      'water_drop': 'assets/images/profile/water.png',
+      'bolt': 'assets/images/profile/2.png',
+      'ac_unit': 'assets/images/profile/3.png',
+      'palette': 'assets/images/profile/7.png',
+      'local_shipping': 'assets/images/profile/8.png',
+      'eco': 'assets/images/profile/12.png',
     };
     return map[icon] ?? 'assets/images/profile/water.png';
   }
@@ -123,10 +151,15 @@ class JobRequestsController extends GetxController {
   // ── Helper: status string → JobStatus ────────────────────────────
   static JobStatus statusFromString(String status) {
     switch (status.toUpperCase()) {
-      case 'COMPLETED' : return JobStatus.completed;
+      case 'COMPLETED':
+        return JobStatus.completed;
       case 'IN_PROCESS':
-      case 'CONFIRMED' : return JobStatus.inProcess;
-      default          : return JobStatus.pending;
+      case 'IN_PROGRESS':
+      case 'ON_THE_WAY':
+      case 'CONFIRMED':
+        return JobStatus.inProcess;
+      default:
+        return JobStatus.pending;
     }
   }
 

@@ -24,31 +24,25 @@ class JobRequestsScreen extends StatelessWidget {
 
             Expanded(
               child: Obx(() {
-                // ── Loading ──────────────────────────────────────
                 if (c.isLoading.value &&
                     c.activeAndCompleted.isEmpty &&
                     c.newLeads.isEmpty) {
                   return const Center(
-                    child: CircularProgressIndicator(
-                        color: Color(0xFFF8C106)),
+                    child: CircularProgressIndicator(color: Color(0xFFF8C106)),
                   );
                 }
 
-                // ── Empty ────────────────────────────────────────
                 if (c.activeAndCompleted.isEmpty && c.newLeads.isEmpty) {
                   return _buildEmpty();
                 }
 
-                // ── List ─────────────────────────────────────────
                 return RefreshIndicator(
                   color: const Color(0xFFF8C106),
                   onRefresh: () => c.fetchRequests(),
                   child: ListView(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 16.w, vertical: 4.h),
+                    padding:
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
                     children: [
-
-                      // ── Active / Completed section ─────────────
                       if (c.activeAndCompleted.isNotEmpty) ...[
                         _buildSectionLabel('Active & Completed'),
                         SizedBox(height: 10.h),
@@ -56,7 +50,8 @@ class JobRequestsScreen extends StatelessWidget {
                           padding: EdgeInsets.only(bottom: 14.h),
                           child: _JobRequestCard(
                             request: r,
-                            status: JobRequestsController.statusFromString(
+                            status:
+                            JobRequestsController.statusFromString(
                                 r['status'] ?? ''),
                             onAccept: () => c.acceptRequest(r['id']),
                             onDecline: () => c.declineRequest(r['id']),
@@ -65,7 +60,6 @@ class JobRequestsScreen extends StatelessWidget {
                         SizedBox(height: 8.h),
                       ],
 
-                      // ── New Leads section ──────────────────────
                       if (c.newLeads.isNotEmpty) ...[
                         _buildSectionLabel('New Leads'),
                         SizedBox(height: 10.h),
@@ -73,7 +67,8 @@ class JobRequestsScreen extends StatelessWidget {
                           padding: EdgeInsets.only(bottom: 14.h),
                           child: _JobRequestCard(
                             request: r,
-                            status: JobRequestsController.statusFromString(
+                            status:
+                            JobRequestsController.statusFromString(
                                 r['status'] ?? ''),
                             onAccept: () => c.acceptRequest(r['id']),
                             onDecline: () => c.declineRequest(r['id']),
@@ -93,7 +88,6 @@ class JobRequestsScreen extends StatelessWidget {
     );
   }
 
-  // ── Section Label ─────────────────────────────────────────────────
   Widget _buildSectionLabel(String title) {
     return Text(
       title,
@@ -105,7 +99,6 @@ class JobRequestsScreen extends StatelessWidget {
     );
   }
 
-  // ── Header ────────────────────────────────────────────────────────
   Widget _buildHeader(JobRequestsController c) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -148,7 +141,6 @@ class JobRequestsScreen extends StatelessWidget {
     );
   }
 
-  // ── Empty ─────────────────────────────────────────────────────────
   Widget _buildEmpty() {
     return Center(
       child: Column(
@@ -159,8 +151,8 @@ class JobRequestsScreen extends StatelessWidget {
           SizedBox(height: 12.h),
           Text(
             'No job requests at the moment.',
-            style: TextStyle(
-                fontSize: 14.sp, color: const Color(0xFF9E9E9E)),
+            style:
+            TextStyle(fontSize: 14.sp, color: const Color(0xFF9E9E9E)),
           ),
         ],
       ),
@@ -188,20 +180,61 @@ class _JobRequestCard extends StatelessWidget {
   bool get _isDimmed =>
       status == JobStatus.completed || status == JobStatus.inProcess;
 
-  // ── Helpers ───────────────────────────────────────────────────────
-  String get _clientName   => request['customer_name'] ?? 'Customer';
-  String get _timeAgo      => request['formatted_date'] ?? '';
-  String get _issueTitle   =>
-      request['service_details']?['name_en'] ??
-          request['service_name'] ??
-          'Service Request';
-  String get _aiDiagnosis  => request['ai_summary'] ?? request['ai_cost'] ?? '—';
-  String get _address      => request['address'] ?? '';
-  String get _zipCode      => request['zip_code'] ?? '—';
-  String get _customerPhoto => request['customer_photo'] ?? '';
-  String get _assetPath    =>
-      JobRequestsController.assetFromIcon(request['service_icon'] ?? '');
-  bool   get _isSold       => request['is_sold'] ?? false;
+  // ── Safe string helper ────────────────────────────────────────────
+  /// Reads any dynamic field as a String. Never casts — avoids the
+  /// "_Map is not a subtype of String?" crash when JSON has nested objects.
+  String _s(dynamic value, {String fallback = ''}) {
+    if (value == null) return fallback;
+    if (value is String) return value.isEmpty ? fallback : value;
+    if (value is Map || value is List) return fallback; // never stringify maps
+    return value.toString();
+  }
+
+  // ── Field accessors ───────────────────────────────────────────────
+  String get _clientName  => _s(request['customer_name'], fallback: 'Customer');
+  String get _timeAgo     => _s(request['formatted_date']);
+  String get _address     => _s(request['address']);
+  String get _zipCode     => _s(request['zip_code'], fallback: '—');
+  String get _customerPhoto => _s(request['customer_photo']);
+
+  /// ai_cost comes from the API as { "min": 160, "max": 380, "currency": "EUR" }
+  /// — NEVER cast it to String? directly.
+  String get _aiCost => _formatAiCost(request['ai_cost']);
+
+  static String _formatAiCost(dynamic aiCost) {
+    if (aiCost == null) return '—';
+    if (aiCost is String) return aiCost.isNotEmpty ? aiCost : '—';
+    if (aiCost is Map) {
+      final min      = aiCost['min'];
+      final max      = aiCost['max'];
+      final currency = aiCost['currency'] ?? '';
+      if (min != null && max != null) return '$currency $min – $max';
+      if (min != null) return '$currency $min';
+      if (max != null) return '$currency $max';
+    }
+    return '—';
+  }
+
+  String get _issueTitle {
+    // service_name is often "" — fall back to service_details.name_en
+    final svcName = _s(request['service_name']);
+    if (svcName.isNotEmpty) return svcName;
+    final details = request['service_details'];
+    if (details is Map) return _s(details['name_en'], fallback: 'Service Request');
+    return 'Service Request';
+  }
+
+  String get _description {
+    final d = _s(request['description']);
+    return d.isNotEmpty ? d : '—';
+  }
+
+  String get _assetPath =>
+      JobRequestsController.assetFromIcon(_s(request['service_icon']));
+
+  bool get _isSold     => request['is_sold'] == true;
+  bool get _isPriority => request['mark_as_priority'] == true;
+  bool get _noChatOnly => request['no_call_just_chat'] == true;
 
   @override
   Widget build(BuildContext context) {
@@ -212,6 +245,11 @@ class _JobRequestCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: _isDimmed ? const Color(0xFFF5F5F5) : Colors.white,
             borderRadius: BorderRadius.circular(16.r),
+            border: _isPriority && !_isDimmed && !_isSold
+                ? Border.all(
+                color: const Color(0xFFEF5350).withOpacity(0.4),
+                width: 1.5)
+                : null,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -236,13 +274,12 @@ class _JobRequestCard extends StatelessWidget {
           ),
         ),
 
-        // ── Sold overlay ─────────────────────────────────────────
         if (_isSold)
           Positioned.fill(
             child: Center(
               child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 16.w, vertical: 10.h),
+                padding:
+                EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFF474747),
                   borderRadius: BorderRadius.circular(30.r),
@@ -281,7 +318,6 @@ class _JobRequestCard extends StatelessWidget {
   Widget _buildClientRow() {
     return Row(
       children: [
-        // Customer Photo
         ClipRRect(
           borderRadius: BorderRadius.circular(22.r),
           child: _customerPhoto.isNotEmpty
@@ -306,6 +342,7 @@ class _JobRequestCard extends StatelessWidget {
               : _buildAvatarFallback(),
         ),
         SizedBox(width: 12.w),
+
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,19 +368,51 @@ class _JobRequestCard extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 12.sp, color: const Color(0xFF9E9E9E)),
                   ),
+                  if (_noChatOnly) ...[
+                    SizedBox(width: 8.w),
+                    Icon(Icons.chat_bubble_outline,
+                        size: 12.sp, color: const Color(0xFF1565C0)),
+                    SizedBox(width: 3.w),
+                    Text('Chat only',
+                        style: TextStyle(
+                            fontSize: 11.sp,
+                            color: const Color(0xFF1565C0))),
+                  ],
                 ],
               ),
             ],
           ),
         ),
-        // Service Icon
-        Image.asset(
-          _assetPath,
-          width: 28.w,
-          height: 28.w,
-          fit: BoxFit.contain,
-          color: _isDimmed ? const Color(0xFFBDBDBD) : null,
-          colorBlendMode: _isDimmed ? BlendMode.saturation : null,
+
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (_isPriority)
+              Container(
+                margin: EdgeInsets.only(bottom: 6.h),
+                padding:
+                EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEBEE),
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  'Priority',
+                  style: TextStyle(
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFEF5350)),
+                ),
+              ),
+            Image.asset(
+              _assetPath,
+              width: 28.w,
+              height: 28.w,
+              fit: BoxFit.contain,
+              color: _isDimmed ? const Color(0xFFBDBDBD) : null,
+              colorBlendMode: _isDimmed ? BlendMode.saturation : null,
+            ),
+          ],
         ),
       ],
     );
@@ -375,9 +444,8 @@ class _JobRequestCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: _isDimmed
-            ? const Color(0xFFEEEEEE)
-            : const Color(0xFFF5F5F5),
+        color:
+        _isDimmed ? const Color(0xFFEEEEEE) : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: Column(
@@ -394,11 +462,38 @@ class _JobRequestCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 5.h),
+
+          if (_description != '—') ...[
+            Text(
+              _description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: _isDimmed
+                    ? const Color(0xFFBDBDBD)
+                    : const Color(0xFF757575),
+                height: 1.4,
+              ),
+            ),
+            SizedBox(height: 6.h),
+          ],
+
           RichText(
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: 'AI:  ',
+                  text: 'Est. Cost  ',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    color: _isDimmed
+                        ? const Color(0xFFBDBDBD)
+                        : const Color(0xFF9E9E9E),
+                  ),
+                ),
+                TextSpan(
+                  text: _aiCost,
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w700,
@@ -406,12 +501,6 @@ class _JobRequestCard extends StatelessWidget {
                         ? const Color(0xFFBDBDBD)
                         : const Color(0xFFF8C106),
                   ),
-                ),
-                TextSpan(
-                  text: _aiDiagnosis,
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: const Color(0xFF9E9E9E)),
                 ),
               ],
             ),
@@ -424,23 +513,16 @@ class _JobRequestCard extends StatelessWidget {
   // ── Address Row ───────────────────────────────────────────────────
   Widget _buildAddressRow() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Icon(Icons.location_on_outlined,
+            size: 14.sp, color: const Color(0xFF9E9E9E)),
+        SizedBox(width: 4.w),
         Expanded(
-          child: Row(
-            children: [
-              Icon(Icons.location_on_outlined,
-                  size: 14.sp, color: const Color(0xFF9E9E9E)),
-              SizedBox(width: 4.w),
-              Flexible(
-                child: Text(
-                  _address,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
-                ),
-              ),
-            ],
+          child: Text(
+            _address,
+            overflow: TextOverflow.ellipsis,
+            style:
+            TextStyle(fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
           ),
         ),
       ],
@@ -471,12 +553,13 @@ class _JobRequestCard extends StatelessWidget {
             ),
           ],
         ),
-        if (status == JobStatus.pending && !_isSold)
-          _buildPendingButtons(),
+        if (status == JobStatus.pending && !_isSold) _buildPendingButtons(),
         if (status == JobStatus.completed)
-          _buildStatusBadge(label: 'Completed'),
+          _buildStatusBadge(
+              label: 'Completed', color: const Color(0xFF43A047)),
         if (status == JobStatus.inProcess)
-          _buildStatusBadge(label: 'In Process'),
+          _buildStatusBadge(
+              label: 'In Process', color: const Color(0xFF1565C0)),
       ],
     );
   }
@@ -493,8 +576,8 @@ class _JobRequestCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(
-                  color: const Color(0xFFE53935), width: 1.5),
+              border:
+              Border.all(color: const Color(0xFFE53935), width: 1.5),
             ),
             child: Row(
               children: [
@@ -538,22 +621,23 @@ class _JobRequestCard extends StatelessWidget {
   }
 
   // ── Status Badge ──────────────────────────────────────────────────
-  Widget _buildStatusBadge({required String label}) {
+  Widget _buildStatusBadge(
+      {required String label, required Color color}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
         children: [
-          Icon(Icons.check, color: const Color(0xFF43A047), size: 14.sp),
+          Icon(Icons.check, color: color, size: 14.sp),
           SizedBox(width: 6.w),
           Text(label,
               style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF43A047))),
+                  color: color)),
         ],
       ),
     );

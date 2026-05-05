@@ -5,164 +5,50 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../controllers/professional_profile_controller.dart';
-// import '../controllers/select_categories_controller.dart';
-// import '../../notification/views/notifications_screen.dart';
-// import 'recent_reviews_screen.dart';
 
 class ProfessionalProfileScreen extends StatelessWidget {
   const ProfessionalProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Put here — this screen owns this controller lifecycle
     final c = Get.put(ProfessionalProfileScreenController());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4F8),
+      backgroundColor: const Color(0xFFFAFAFA),
       body: SafeArea(
         child: Obx(() {
-          // ── Full-screen loader on first fetch ──────────────────
-          if (c.isLoading.value && c.userName.value.isEmpty) {
+          if (c.isLoading.value) {
             return const Center(
               child: CircularProgressIndicator(color: Color(0xFFF8C106)),
             );
           }
-
           return Column(
             children: [
               SizedBox(height: 16.h),
               _buildHeader(context, c),
+              Divider(height: 20.h, color: const Color(0xFFEEEEEE)),
               Expanded(
                 child: RefreshIndicator(
                   color: const Color(0xFFF8C106),
-                  onRefresh: c.fetchProviderProfile,
+                  onRefresh: () => c.fetchProviderProfile(),
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20.h),
-
-                        // ── Profile Card ──────────────────────────
+                        SizedBox(height: 4.h),
                         _buildProfileCard(c),
                         SizedBox(height: 16.h),
-
-                        // ── Stats Row ─────────────────────────────
                         _buildStatsRow(c),
                         SizedBox(height: 24.h),
-
-                        // ── Categories Section ────────────────────
-                        Text(
-                          'Categories',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF212121),
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                        _buildCategoriesCard(context, c),
+                        _buildVerificationsSection(c),
                         SizedBox(height: 24.h),
-
-                        // ── Recent Reviews ────────────────────────
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Recent Reviews',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFF212121),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                // Get.to(() => const ReviewsScreen());
-                              },
-                              child: Text(
-                                'View All',
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF2563EB),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 12.h),
-                        _buildReviewCard(
-                          initials: 'DC',
-                          color: const Color(0xFFF59E0B),
-                          name: 'David Cohen',
-                          rating: 5,
-                          comment: 'Excellent work, very professional!',
-                        ),
-                        SizedBox(height: 10.h),
-                        _buildReviewCard(
-                          initials: 'SL',
-                          color: const Color(0xFFEF4444),
-                          name: 'Sarah Levi',
-                          rating: 5,
-                          comment: 'Fixed the issue quickly. Highly recommend!',
-                        ),
+                        _buildBioSection(c),
+                        SizedBox(height: 24.h),
+                        _buildAccountActions(context, c),
                         SizedBox(height: 32.h),
-
-                        // ── Delete Account ────────────────────────
-                        GestureDetector(
-                          onTap: () => c.showDeleteAccountDialog(context),
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 40.w),
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(30.r),
-                              border: Border.all(
-                                  color: const Color(0xFFE53935), width: 1.5),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.delete_outline,
-                                    color: const Color(0xFFE53935),
-                                    size: 18.sp),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  'Delete Account',
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFFE53935),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 16.h),
-
-                        // ── Log Out ───────────────────────────────
-                        GestureDetector(
-                          onTap: () => c.showLogoutDialog(context),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.logout_rounded,
-                                  color: const Color(0xFFE53935), size: 20.sp),
-                              SizedBox(width: 8.w),
-                              Text(
-                                'Log Out',
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFFE53935),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 40.h),
                       ],
                     ),
                   ),
@@ -175,11 +61,10 @@ class ProfessionalProfileScreen extends StatelessWidget {
     );
   }
 
-  // ─────────────────────── Header ──────────────────────────────────
-  Widget _buildHeader(
-      BuildContext context, ProfessionalProfileScreenController c) {
+  // ─────────────────────── Header ────────────────────────────────
+  Widget _buildHeader(BuildContext context, ProfessionalProfileScreenController c) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(
         children: [
           GestureDetector(
@@ -187,7 +72,7 @@ class ProfessionalProfileScreen extends StatelessWidget {
             child: Icon(Icons.arrow_back,
                 size: 22.sp, color: const Color(0xFF212121)),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 16.w),
           Text(
             'My Profile',
             style: TextStyle(
@@ -197,443 +82,473 @@ class ProfessionalProfileScreen extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          // Pull-to-refresh also works; this is a manual reload button
-          Obx(() => c.isLoading.value
-              ? SizedBox(
-            width: 20.w,
-            height: 20.w,
-            child: const CircularProgressIndicator(
-              strokeWidth: 2,
-              color: Color(0xFFF8C106),
+          // Logout icon in header
+          GestureDetector(
+            onTap: () => c.showLogoutDialog(context),
+            child: Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFEBEE),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(Icons.logout,
+                  size: 18.sp, color: const Color(0xFFE53935)),
             ),
-          )
-              : GestureDetector(
-            onTap: c.fetchProviderProfile,
-            child: Icon(Icons.refresh_rounded,
-                size: 22.sp, color: const Color(0xFF212121)),
-          )),
+          ),
         ],
       ),
     );
   }
 
-  // ─────────────────────── Profile Card ────────────────────────────
+  // ─────────────────────── Profile Card ──────────────────────────
   Widget _buildProfileCard(ProfessionalProfileScreenController c) {
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
+              blurRadius: 10,
               offset: const Offset(0, 2)),
         ],
       ),
       child: Row(
         children: [
-          // ── Avatar: network photo OR initials fallback ─────────
-          Obx(() => ClipRRect(
-            borderRadius: BorderRadius.circular(28.r),
-            child: c.profilePhotoUrl.value.isNotEmpty
-                ? Image.network(
-              c.profilePhotoUrl.value,
-              width: 56.w,
-              height: 56.w,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  _initialsAvatar(c.userName.value),
-            )
-                : _initialsAvatar(c.userName.value),
-          )),
-          SizedBox(width: 16.w),
-          Obx(() => Expanded(
-            child: Column(
+          // ── Avatar with online dot ─────────────────────────────
+          Stack(
+            children: [
+              Obx(() {
+                final imageUrl = c.profilePhotoUrl.value;
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(30.r),
+                  child: imageUrl.isNotEmpty
+                      ? Image.network(
+                    imageUrl,
+                    width: 64.w,
+                    height: 64.w,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        _buildAvatarFallback(c),
+                  )
+                      : _buildAvatarFallback(c),
+                );
+              }),
+              Positioned(
+                bottom: 2, right: 2,
+                child: Obx(() => Container(
+                  width: 14.w, height: 14.w,
+                  decoration: BoxDecoration(
+                    color: c.isOnline.value
+                        ? const Color(0xFF43A047)
+                        : const Color(0xFFBDBDBD),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                )),
+              ),
+            ],
+          ),
+          SizedBox(width: 14.w),
+
+          // ── Name + Email + Status pill ─────────────────────────
+          Expanded(
+            child: Obx(() => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Name + verified badge
                 Row(
                   children: [
                     Flexible(
                       child: Text(
-                        c.userName.value.isEmpty ? '—' : c.userName.value,
+                        c.userName.value.isNotEmpty
+                            ? c.userName.value
+                            : 'Professional',
                         style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF212121),
-                        ),
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF212121)),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (c.isVerified.value) ...[
                       SizedBox(width: 6.w),
-                      Icon(Icons.verified_rounded,
-                          color: const Color(0xFF2563EB), size: 16.sp),
+                      Icon(Icons.verified,
+                          color: const Color(0xFF1565C0), size: 16.sp),
                     ],
                   ],
                 ),
                 SizedBox(height: 4.h),
-                // Category
                 Text(
-                  c.categoryName.value,
+                  c.userEmail.value.isNotEmpty ? c.userEmail.value : '—',
                   style: TextStyle(
-                      fontSize: 13.sp, color: const Color(0xFF757575)),
+                      fontSize: 13.sp, color: const Color(0xFF9E9E9E)),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                if (c.zipCode.value.isNotEmpty) ...[
-                  SizedBox(height: 2.h),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on_outlined,
-                          size: 13.sp, color: const Color(0xFF9E9E9E)),
-                      SizedBox(width: 2.w),
-                      Text(
-                        c.zipCode.value,
-                        style: TextStyle(
-                            fontSize: 12.sp,
-                            color: const Color(0xFF9E9E9E)),
-                      ),
-                    ],
+                SizedBox(height: 6.h),
+                // Online / Offline pill
+                Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 8.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: c.isOnline.value
+                        ? const Color(0xFFE8F5E9)
+                        : const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(20.r),
                   ),
-                ],
+                  child: Text(
+                    c.isOnline.value ? 'Online' : 'Offline',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w600,
+                      color: c.isOnline.value
+                          ? const Color(0xFF43A047)
+                          : const Color(0xFF9E9E9E),
+                    ),
+                  ),
+                ),
               ],
-            ),
-          )),
+            )),
+          ),
         ],
       ),
     );
   }
 
-  Widget _initialsAvatar(String name) {
-    String initials = '?';
-    if (name.trim().isNotEmpty) {
-      final parts = name.trim().split(' ');
-      initials = parts.length >= 2
-          ? '${parts[0][0]}${parts[1][0]}'.toUpperCase()
-          : parts[0][0].toUpperCase();
-    }
+  Widget _buildAvatarFallback(ProfessionalProfileScreenController c) {
+    final name = c.userName.value;
     return Container(
-      width: 56,
-      height: 56,
-      color: const Color(0xFFF8C106).withOpacity(0.15),
-      alignment: Alignment.center,
-      child: Text(
-        initials,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          color: Color(0xFFF8C106),
+      width: 64.w, height: 64.w,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8C106),
+        borderRadius: BorderRadius.circular(30.r),
+      ),
+      child: Center(
+        child: Text(
+          name.isNotEmpty ? name[0].toUpperCase() : 'P',
+          style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.white),
         ),
       ),
     );
   }
 
-  // ─────────────────────── Stats Row ───────────────────────────────
+  // ─────────────────────── Stats Row ─────────────────────────────
   Widget _buildStatsRow(ProfessionalProfileScreenController c) {
     return Obx(() => Row(
       children: [
-        _buildStatCard(
-          icon: Icons.bolt_outlined,
-          iconColor: const Color(0xFFEF4444),
-          value: c.emergencyCount.value.toString(),
-          label: 'Emergency',
+        Expanded(
+          child: _buildStatCard(
+            iconWidget: _buildIconCircle(Icons.work_outline,
+                const Color(0xFFE3F2FD), const Color(0xFF1E88E5)),
+            value: '${c.jobsCount.value}',
+            label: 'Jobs',
+          ),
         ),
-        SizedBox(width: 10.w),
-        _buildStatCard(
-          icon: Icons.check_circle_outline,
-          iconColor: const Color(0xFF22C55E),
-          value: c.jobsCount.value.toString(),
-          label: 'Jobs',
+        SizedBox(width: 12.w),
+        Expanded(
+          child: _buildStatCard(
+            iconWidget: _buildIconCircle(Icons.star_border,
+                const Color(0xFFFFF8E1), const Color(0xFFF8C106)),
+            value: c.rating.value.toStringAsFixed(1),
+            label: 'Rating',
+          ),
         ),
-        SizedBox(width: 10.w),
-        _buildStatCard(
-          icon: Icons.star_outline_rounded,
-          iconColor: const Color(0xFFF59E0B),
-          // rating from API e.g. "5.00"
-          value: c.rating.value.toStringAsFixed(1),
-          label: 'Rating',
+        SizedBox(width: 12.w),
+        Expanded(
+          child: _buildStatCard(
+            iconWidget: _buildIconCircle(Icons.warning_amber_rounded,
+                const Color(0xFFFFEBEE), const Color(0xFFEF5350)),
+            value: '${c.emergencyCount.value}',
+            label: 'Emergency',
+          ),
         ),
       ],
     ));
   }
 
-  Widget _buildStatCard({
-    required IconData icon,
-    required Color iconColor,
-    required String value,
-    required String label,
-  }) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 16.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 6,
-                offset: const Offset(0, 2)),
-          ],
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 40.w,
-              height: 40.w,
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: iconColor, size: 22.sp),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF212121),
-              ),
-            ),
-            SizedBox(height: 2.h),
-            Text(label,
-                style:
-                TextStyle(fontSize: 11.sp, color: const Color(0xFF9E9E9E))),
-          ],
-        ),
-      ),
+  Widget _buildIconCircle(IconData icon, Color bg, Color iconColor) {
+    return Container(
+      width: 36.w, height: 36.w,
+      decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+      child: Icon(icon, color: iconColor, size: 18.sp),
     );
   }
 
-  // ─────────────────────── Categories Card ─────────────────────────
-  Widget _buildCategoriesCard(
-      BuildContext context, ProfessionalProfileScreenController c) {
+  Widget _buildStatCard({
+    required Widget iconWidget,
+    required String value,
+    required String label,
+  }) {
     return Container(
+      padding: EdgeInsets.symmetric(vertical: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withOpacity(0.04),
               blurRadius: 8,
               offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
         children: [
-          _buildCategoryItem(
-            icon: Icons.person_outline,
-            title: 'Personal Info',
-            trailing: Icon(Icons.arrow_forward_ios,
-                size: 14.sp, color: const Color(0xFF9E9E9E)),
-            showDivider: true,
-            onTap: () {},
-          ),
-          _buildCategoryItem(
-            icon: Icons.shield_outlined,
-            title: 'ID Verification',
-            trailing: Obx(() => Container(
-              padding:
-              EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: c.isVerified.value
-                    ? const Color(0xFFDCFCE7)
-                    : const Color(0xFFFFF3E0),
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-              child: Text(
-                c.isVerified.value ? 'Verified' : 'Pending',
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w600,
-                  color: c.isVerified.value
-                      ? const Color(0xFF16A34A)
-                      : const Color(0xFFE65100),
-                ),
-              ),
-            )),
-            showDivider: true,
-            onTap: () {},
-          ),
-          _buildCategoryItem(
-            icon: Icons.description_outlined,
-            title: 'Certificates',
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 22.w,
-                  height: 22.w,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDBEAFE),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '3',
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF2563EB),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Icon(Icons.arrow_forward_ios,
-                    size: 14.sp, color: const Color(0xFF9E9E9E)),
-              ],
-            ),
-            showDivider: true,
-            onTap: () {},
-          ),
-          _buildCategoryItem(
-            icon: Icons.location_on_outlined,
-            title: 'Service Areas',
-            trailing: Icon(Icons.arrow_forward_ios,
-                size: 14.sp, color: const Color(0xFF9E9E9E)),
-            showDivider: true,
-            onTap: () {},
-          ),
-          _buildCategoryItem(
-            icon: Icons.add_location_outlined,
-            title: 'Add Services',
-            trailing: Icon(Icons.arrow_forward_ios,
-                size: 14.sp, color: const Color(0xFF9E9E9E)),
-            showDivider: false,
-            onTap: () {
-              // SelectCategoriesController.show(context);
-            },
-          ),
+          iconWidget,
+          SizedBox(height: 10.h),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF212121))),
+          SizedBox(height: 2.h),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 12.sp, color: const Color(0xFF9E9E9E))),
         ],
       ),
     );
   }
 
-  Widget _buildCategoryItem({
+  // ─────────────────────── Verifications ─────────────────────────
+  Widget _buildVerificationsSection(ProfessionalProfileScreenController c) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.verified_user_outlined,
+                    color: const Color(0xFF43A047), size: 20.sp),
+                SizedBox(width: 8.w),
+                Text('Verifications',
+                    style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF212121))),
+              ],
+            ),
+            Obx(() => c.isVerified.value
+                ? _statusPill('Verified Pro',
+                bg: const Color(0xFFE8F5E9),
+                border: const Color(0xFF43A047),
+                text: const Color(0xFF43A047))
+                : _statusPill('Unverified',
+                bg: const Color(0xFFFFF8E1),
+                border: const Color(0xFFF8C106),
+                text: const Color(0xFFF57F17))),
+          ],
+        ),
+        SizedBox(height: 14.h),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2)),
+            ],
+          ),
+          child: Obx(() => Column(
+            children: [
+              _buildTile(Icons.card_membership, 'Certificates',
+                  '${c.certificates.value}'),
+              const Divider(height: 1, color: Color(0xFFEEEEEE)),
+              _buildTile(
+                Icons.event_available,
+                'Availability',
+                c.isAvailable.value ? 'Available' : 'Unavailable',
+                valueColor: c.isAvailable.value
+                    ? const Color(0xFF43A047)
+                    : const Color(0xFF9E9E9E),
+              ),
+              const Divider(height: 1, color: Color(0xFFEEEEEE)),
+              _buildTile(
+                Icons.verified_user,
+                'Account Status',
+                c.isVerified.value ? 'Verified' : 'Pending Verification',
+                valueColor: c.isVerified.value
+                    ? const Color(0xFF43A047)
+                    : const Color(0xFFFF8F00),
+              ),
+            ],
+          )),
+        ),
+      ],
+    );
+  }
+
+  Widget _statusPill(String label,
+      {required Color bg, required Color border, required Color text}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: border, width: 1),
+      ),
+      child: Text(label,
+          style: TextStyle(
+              fontSize: 11.sp, fontWeight: FontWeight.w600, color: text)),
+    );
+  }
+
+  Widget _buildTile(IconData icon, String title, String value,
+      {Color valueColor = const Color(0xFF43A047)}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20.sp, color: Colors.blueGrey),
+              SizedBox(width: 12.w),
+              Text(title,
+                  style: TextStyle(
+                      fontSize: 14.sp, color: const Color(0xFF212121))),
+            ],
+          ),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w700,
+                  color: valueColor)),
+        ],
+      ),
+    );
+  }
+
+  // ─────────────────────── Bio Section ───────────────────────────
+  Widget _buildBioSection(ProfessionalProfileScreenController c) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Professional Bio',
+          style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF212121)),
+        ),
+        SizedBox(height: 12.h),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2)),
+            ],
+          ),
+          child: Obx(() => Text(
+            c.bio.value.isNotEmpty ? c.bio.value : 'No bio provided.',
+            style: TextStyle(
+                fontSize: 13.sp,
+                color: c.bio.value.isNotEmpty
+                    ? const Color(0xFF424242)
+                    : const Color(0xFF9E9E9E),
+                height: 1.6),
+          )),
+        ),
+      ],
+    );
+  }
+
+  // ─────────────────────── Account Actions ───────────────────────
+  Widget _buildAccountActions(
+      BuildContext context, ProfessionalProfileScreenController c) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Account',
+          style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF212121)),
+        ),
+        SizedBox(height: 12.h),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2)),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Logout
+              _buildActionTile(
+                icon: Icons.logout,
+                iconBg: const Color(0xFFFFEBEE),
+                iconColor: const Color(0xFFE53935),
+                label: 'Log Out',
+                labelColor: const Color(0xFFE53935),
+                onTap: () => c.showLogoutDialog(context),
+              ),
+              const Divider(height: 1, color: Color(0xFFEEEEEE)),
+              // Delete account
+              _buildActionTile(
+                icon: Icons.delete_outline,
+                iconBg: const Color(0xFFFFEBEE),
+                iconColor: const Color(0xFFE53935),
+                label: 'Delete Account',
+                labelColor: const Color(0xFFE53935),
+                onTap: () => c.showDeleteAccountDialog(context),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionTile({
     required IconData icon,
-    required String title,
-    required Widget trailing,
-    required bool showDivider,
-    required VoidCallback? onTap,
+    required Color iconBg,
+    required Color iconColor,
+    required String label,
+    required Color labelColor,
+    required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Padding(
-            padding:
-            EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-            child: Row(
-              children: [
-                Icon(icon, size: 22.sp, color: const Color(0xFF424242)),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF212121),
-                    ),
-                  ),
-                ),
-                trailing,
-              ],
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        child: Row(
+          children: [
+            Container(
+              width: 36.w, height: 36.w,
+              decoration:
+              BoxDecoration(color: iconBg, shape: BoxShape.circle),
+              child: Icon(icon, color: iconColor, size: 18.sp),
             ),
-          ),
-          if (showDivider)
-            Divider(
-              height: 1,
-              thickness: 1,
-              indent: 16.w,
-              endIndent: 16.w,
-              color: const Color(0xFFEEEEEE),
-            ),
-        ],
-      ),
-    );
-  }
-
-  // ─────────────────────── Review Card ─────────────────────────────
-  Widget _buildReviewCard({
-    required String initials,
-    required Color color,
-    required String name,
-    required int rating,
-    required String comment,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(14.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2)),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 40.w,
-            height: 40.w,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: Center(
-              child: Text(
-                initials,
+            SizedBox(width: 14.w),
+            Text(label,
                 style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF212121),
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Row(
-                      children: List.generate(
-                        5,
-                            (i) => Icon(
-                          i < rating
-                              ? Icons.star_rounded
-                              : Icons.star_outline_rounded,
-                          size: 14.sp,
-                          color: const Color(0xFFF59E0B),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  comment,
-                  style: TextStyle(
-                      fontSize: 12.sp, color: const Color(0xFF757575)),
-                ),
-              ],
-            ),
-          ),
-        ],
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: labelColor)),
+            const Spacer(),
+            Icon(Icons.chevron_right,
+                color: const Color(0xFFBDBDBD), size: 20.sp),
+          ],
+        ),
       ),
     );
   }

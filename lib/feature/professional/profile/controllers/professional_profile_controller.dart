@@ -8,60 +8,31 @@ import '../../../../core/endpoint/api_endpoint.dart';
 import '../../../../core/local_storage/user_info.dart';
 import '../../../../routes/route_name.dart';
 
-// ─── Provider Profile Model ───────────────────────────────────────
-class ProviderProfileModel {
-  final int id;
-  final String fullName;
-  final String categoryName;
-  final String? profilePhoto;
-  final String? zipCode;
-  final bool isVerified;
-  final double rating;
-
-  ProviderProfileModel({
-    required this.id,
-    required this.fullName,
-    required this.categoryName,
-    this.profilePhoto,
-    this.zipCode,
-    required this.isVerified,
-    required this.rating,
-  });
-
-  factory ProviderProfileModel.fromJson(Map<String, dynamic> json) =>
-      ProviderProfileModel(
-        id: json['id'] ?? 0,
-        fullName: json['full_name'] ?? '',
-        categoryName: json['category_name'] ?? '',
-        profilePhoto: json['profile_photo'],
-        zipCode: json['zip_code'],
-        isVerified: json['is_verified'] ?? false,
-        rating: double.tryParse(json['rating']?.toString() ?? '0') ?? 0.0,
-      );
-}
-
 // ─── Controller ──────────────────────────────────────────────────
 class ProfessionalProfileScreenController extends GetxController {
   final ApiClient _apiClient = ApiClient(baseUrl: ApiEndpoint.baseUrl);
 
   // ── Loading states ─────────────────────────────────────────────
-  final RxBool isLoading = false.obs;
-  final RxBool isLogoutLoading = false.obs;
+  final RxBool isLoading        = false.obs;
+  final RxBool isLogoutLoading  = false.obs;
 
-  // ── Profile fields (reactive) ──────────────────────────────────
-  final RxInt userId = 0.obs;
-  final RxString userName = ''.obs;
-  final RxString userEmail = ''.obs;       // from UserInfo cache (not in provider endpoint)
-  final RxString categoryName = ''.obs;
+  // ── Profile fields ─────────────────────────────────────────────
+  // All sourced from response['profile'] inside /services/requests/pro/homepage/
+  final RxInt    userId          = 0.obs;
+  final RxString userName        = ''.obs;
+  final RxString userEmail       = ''.obs;
   final RxString profilePhotoUrl = ''.obs;
-  final RxString zipCode = ''.obs;
-  final RxBool isVerified = false.obs;
-  final RxDouble rating = 0.0.obs;
+  final RxString bio             = ''.obs;
+  final RxBool   isVerified      = false.obs;
+  final RxBool   isAvailable     = false.obs;
+  final RxBool   isOnline        = false.obs;
+  final RxInt    certificates    = 0.obs;
 
   // ── Stats ──────────────────────────────────────────────────────
-  // TODO: replace with real API data when available
-  final RxInt emergencyCount = 0.obs;
-  final RxInt jobsCount = 0.obs;
+  // Sourced from response['stats'] with fallback to response['profile']
+  final RxInt    emergencyCount  = 0.obs;
+  final RxInt    jobsCount       = 0.obs;
+  final RxDouble rating          = 0.0.obs;
 
   // ── Delete account dialog ──────────────────────────────────────
   final RxBool isDeleteChecked = false.obs;
@@ -74,44 +45,77 @@ class ProfessionalProfileScreenController extends GetxController {
 
   // ─────────────────────────────────────────────────────────────────
   // FETCH PROVIDER PROFILE
-  // GET /services/providers/
-  // Response: List → we take index [0] (the logged-in provider's profile)
+  // GET /services/requests/pro/homepage/
+  // Response shape:
+  // {
+  //   "profile": { "id", "full_name", "email", "photo", "bio",
+  //                "is_verified", "is_available", "certificates",
+  //                "emergency_count", "jobs_count", "rating" },
+  //   "is_online": bool,
+  //   "stats": { "emergency_count", "active_jobs_count", "rating" },
+  //   ...
+  // }
   // ─────────────────────────────────────────────────────────────────
   Future<void> fetchProviderProfile() async {
     isLoading.value = true;
     try {
+      print('👤 [PROFILE CTRL] Fetching ${ApiEndpoint.proHomepage} ...');
+
       final response = await _apiClient.get(
-        ApiEndpoint.providerProfile,
+        ApiEndpoint.proHomepage,
         requiresAuth: true,
       );
 
-      if (response != null) {
-        // Response is a List — the logged-in provider is the first item
-        List<dynamic> list = [];
-        if (response is List) {
-          list = response;
-        } else if (response is Map && response.containsKey('results')) {
-          // Handle paginated response: { "results": [...] }
-          list = response['results'] as List<dynamic>? ?? [];
-        }
-
-        if (list.isNotEmpty) {
-          final model = ProviderProfileModel.fromJson(
-              list[0] as Map<String, dynamic>);
-
-          userId.value = model.id;
-          userName.value = model.fullName;
-          categoryName.value = model.categoryName;
-          profilePhotoUrl.value = model.profilePhoto ?? '';
-          zipCode.value = model.zipCode ?? '';
-          isVerified.value = model.isVerified;
-          rating.value = model.rating;
-        }
+      if (response == null) {
+        _showError('No data received from server.');
+        return;
       }
+
+      // ── Profile block ────────────────────────────────────────
+      final profile =
+          (response['profile'] as Map?)?.cast<String, dynamic>() ?? {};
+
+      userId.value      = profile['id']           ?? 0;
+      userName.value    = profile['full_name']     ?? '';
+      userEmail.value   = profile['email']         ?? '';
+      bio.value         = profile['bio']           ?? '';
+      isVerified.value  = profile['is_verified']   ?? false;
+      isAvailable.value = profile['is_available']  ?? false;
+      certificates.value = profile['certificates'] ?? 0;
+
+      // photo is a relative path like "/media/providers/photos/..."
+      // prepend base URL so Image.network can load it correctly
+      final rawPhoto = (profile['photo'] as String?) ?? '';
+      profilePhotoUrl.value = rawPhoto.isNotEmpty
+          ? '${ApiEndpoint.baseUrl}$rawPhoto'
+          : '';
+
+      final profileRating =
+          double.tryParse(profile['rating']?.toString() ?? '0') ?? 0.0;
+
+      // ── Online status ────────────────────────────────────────
+      isOnline.value = response['is_online'] ?? false;
+
+      // ── Stats block ──────────────────────────────────────────
+      final stats =
+          (response['stats'] as Map?)?.cast<String, dynamic>() ?? {};
+
+      emergencyCount.value =
+          stats['emergency_count']   ?? profile['emergency_count'] ?? 0;
+      jobsCount.value      =
+          stats['active_jobs_count'] ?? profile['jobs_count']      ?? 0;
+
+      final statsRating =
+          double.tryParse(stats['rating']?.toString() ?? '0') ?? 0.0;
+      rating.value = statsRating > 0 ? statsRating : profileRating;
+
+      print('✅ [PROFILE CTRL] Loaded — ${userName.value} | rating: ${rating.value}');
+
     } on HttpException catch (e) {
+      print('❌ [PROFILE CTRL] HttpException: ${e.message}');
       _showError(e.message);
     } catch (e) {
-      print('❌ fetchProviderProfile error: $e');
+      print('❌ [PROFILE CTRL] Error: $e');
       _showError('Failed to load profile. Please try again.');
     } finally {
       isLoading.value = false;
@@ -120,8 +124,7 @@ class ProfessionalProfileScreenController extends GetxController {
 
   // ─────────────────────────────────────────────────────────────────
   // LOGOUT
-  // POST /auth/logout/
-  // Body: { "refresh": "<refresh_token>" }
+  // POST /auth/logout/   Body: { "refresh": "<refresh_token>" }
   // Even if the API call fails, we clear local storage and go to SignIn.
   // ─────────────────────────────────────────────────────────────────
   Future<void> logout() async {
@@ -136,7 +139,6 @@ class ProfessionalProfileScreenController extends GetxController {
         );
       }
     } catch (e) {
-      // Token already expired or network error — proceed with local logout anyway
       print('⚠️ Logout API error (ignored): $e');
     } finally {
       isLogoutLoading.value = false;
@@ -160,7 +162,7 @@ class ProfessionalProfileScreenController extends GetxController {
 
   Future<void> confirmDeleteAccount() async {
     if (!isDeleteChecked.value) return;
-    Get.back(); // close dialog
+    Get.back();
     // TODO: call DELETE /auth/delete-account/ endpoint
     await UserInfo.clearAll();
     Get.offAllNamed(RouteName.signin);
@@ -173,10 +175,8 @@ class ProfessionalProfileScreenController extends GetxController {
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Log Out',
-          style: TextStyle(fontWeight: FontWeight.w700),
-        ),
+        title: const Text('Log Out',
+            style: TextStyle(fontWeight: FontWeight.w700)),
         content: const Text('Are you sure you want to log out?'),
         actions: [
           TextButton(
@@ -188,20 +188,14 @@ class ProfessionalProfileScreenController extends GetxController {
             onPressed: isLogoutLoading.value ? null : logout,
             child: isLogoutLoading.value
                 ? const SizedBox(
-              width: 16,
-              height: 16,
+              width: 16, height: 16,
               child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Color(0xFFE53935),
-              ),
+                  strokeWidth: 2, color: Color(0xFFE53935)),
             )
-                : const Text(
-              'Log Out',
-              style: TextStyle(
-                color: Color(0xFFE53935),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+                : const Text('Log Out',
+                style: TextStyle(
+                    color: Color(0xFFE53935),
+                    fontWeight: FontWeight.w700)),
           )),
         ],
       ),
@@ -209,11 +203,11 @@ class ProfessionalProfileScreenController extends GetxController {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // SNACKBARS
+  // HELPERS
   // ─────────────────────────────────────────────────────────────────
   void _showError(String message) {
     Get.snackbar(
-      "Error", message,
+      'Error', message,
       snackPosition: SnackPosition.TOP,
       backgroundColor: Colors.red.shade700,
       colorText: Colors.white,
@@ -244,7 +238,8 @@ class _DeleteAccountDialog extends StatelessWidget {
               alignment: Alignment.topRight,
               child: GestureDetector(
                 onTap: () => Get.back(),
-                child: const Icon(Icons.close, color: Color(0xFF9E9E9E), size: 22),
+                child: const Icon(Icons.close,
+                    color: Color(0xFF9E9E9E), size: 22),
               ),
             ),
             const SizedBox(height: 4),

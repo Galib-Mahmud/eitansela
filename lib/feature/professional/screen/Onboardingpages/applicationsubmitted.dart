@@ -105,7 +105,7 @@ class Screen4ApplicationSubmitted extends StatelessWidget {
           ],
         ),
       ),
-      bottomButton: PrimaryButton(label: 'Back to Home', onTap: onHome),
+      bottomButton: PrimaryButton(label: 'Next', onTap: onHome),
     );
   }
 }

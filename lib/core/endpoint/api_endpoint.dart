@@ -45,4 +45,6 @@ class ApiEndpoint {
   static String proRequestRespond(int id)  => '/services/requests/$id/respond/';
   static String proAdvanceStatus(int id)   => '/services/requests/$id/advance-status/';
   static String proSubmitBill(int id)      => '/services/requests/$id/submit-bill/';
+  static String chatMessages(int id)  => '/api/requests/$id/messages/';
+  static String chatWebSocket(int id) => 'ws://handyapi.dsrt321.online/ws/chat/$id/';
 }

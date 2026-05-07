@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../../routes/route_name.dart';
 import '../controllers/profile_controller.dart';
 // import '../../../customer/notification/views/notifications_screen.dart';
 // import '../../../../routes/route_name.dart';
@@ -50,14 +51,21 @@ class ProfileScreen extends StatelessWidget {
                           icon: Icons.location_on_outlined,
                           title: 'Saved Addresses',
                           subtitle: '3 saved',
-                          onTap: () {}, // Get.toNamed(RouteName.savedAddresses)
+                          onTap: () {
+                             Get.toNamed(RouteName.savedAddresses);
+
+                          },
                         ),
                         SizedBox(height: 12.h),
                         _buildMenuItem(
                           icon: Icons.notifications_outlined,
                           title: 'Notifications',
                           subtitle: 'On',
-                          onTap: () {}, // Get.to(() => const NotificationsScreen())
+                          onTap: () {
+
+                            Get.toNamed(RouteName.notification);
+
+                          },
                         ),
                         SizedBox(height: 12.h),
                         _buildMenuItem(

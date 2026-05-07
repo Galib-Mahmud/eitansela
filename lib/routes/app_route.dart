@@ -4,6 +4,7 @@ import 'package:eitansela/feature/professional/screen/homepage.dart';
 import 'package:eitansela/feature/splash/screen/onboarding_screen1.dart';
 import 'package:eitansela/feature/splash/screen/splash_screen.dart';
 import 'package:eitansela/routes/route_name.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
 import '../feature/auth/screen/forget_password_screen.dart';
@@ -12,6 +13,7 @@ import '../feature/auth/screen/password_reset_screen.dart';
 import '../feature/auth/screen/password_reset_sucess_screen.dart';
 import '../feature/auth/screen/sign_up_screen.dart';
 import '../feature/customer/main_screen.dart';
+import '../feature/customer/notification/views/notifications_screen.dart';
 import '../feature/customer/profile/views/professional_profile_screen.dart';
 import '../feature/customer/screen/analysis_loading_screen.dart';
 import '../feature/customer/screen/chat_screen.dart';
@@ -68,6 +70,8 @@ class AppRoute {
     GetPage(name: RouteName.location,          page: () => ScheduleConfirmationScreen()),
     GetPage(name: RouteName.confirmReq,        page: () => ConfirmRequestScreen()),
     GetPage(name: RouteName.close,             page: () => RequestClosedScreen()),
+    GetPage(name: RouteName.notification,      page: () => NotificationsScreen()),
+
 
     // ── Professional ──────────────────────────────────────────────
     GetPage(name: RouteName.main1,           page: () => MainScreen1()),

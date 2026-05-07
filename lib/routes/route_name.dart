@@ -24,6 +24,7 @@ class RouteName{
   static const String confirmReq = '/confirmReq';
   static const String review = '/review';
   static const String close = '/close';
+  static const String notification = '/notification';
 
 
 //Professional
@@ -34,6 +35,7 @@ class RouteName{
   static const String onboarding1 = '/onboarding1';
   static const String subscription = '/subscription';
   static const String activejob = '/activejob';
+
 
 
 

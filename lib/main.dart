@@ -10,6 +10,7 @@ import 'core/local_storage/user_info.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Get.config(enableLog: true);
 
   await UserInfo.init();
 

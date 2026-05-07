@@ -8,6 +8,9 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../../core/endpoint/api_client.dart';
 import '../../../../../core/endpoint/api_endpoint.dart';
+import '../../../../../core/local_storage/user_info.dart';
+import '../../../../customer/screen/chat_screen.dart';
+import '../../../../customer/screen/home/controllers/chat_controller.dart';
 
 // ── Progress Step Models ───────────────────────────────────────────
 enum JobProgressStatus { pending, active, completed }
@@ -314,7 +317,21 @@ class ActiveJobController extends GetxController {
   // CHAT
   // ─────────────────────────────────────────────────────────────────
   void openChat() {
-    Get.snackbar('Chat', 'Opening chat with ${clientName.value}...');
+    if (Get.isRegistered<ProfessionalChatController>()) {
+      Get.delete<ProfessionalChatController>(force: true);
+    }
+    Get.put(ProfessionalChatController());
+
+    Get.to(
+          () => const ProfessionalChatScreen(),
+      arguments: {
+        'requestId'  : jobId,
+        'clientName' : clientName.value,
+        'jobLabel'   : '${serviceName.value} • Job #$jobId',
+        'clientPhoto': clientImage.value,
+        'myName'     : UserInfo.getFullNameSync() ?? '',  // ✅
+      },
+    );
   }
 
   // ─────────────────────────────────────────────────────────────────

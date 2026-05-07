@@ -271,6 +271,7 @@ class AuthController extends GetxController {
         // ── Save tokens ──────────────────────────────────────────
         await UserInfo.setAccessToken(response['access'] ?? '');
         await UserInfo.setRefreshToken(response['refresh'] ?? '');
+        await UserInfo.setFullName(response['full_name'] ?? ''); // ← এটা add করো
 
         // ── Save role and onboarding_status ──────────────────────
         final user = response['user'] as Map<String, dynamic>?;

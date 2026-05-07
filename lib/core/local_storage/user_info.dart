@@ -80,4 +80,8 @@ class UserInfo {
 
   // ======= Clear All (logout) ======= //
   static Future<void> clearAll() async => await _p.clear();
+  // ======= Full Name ======= //
+  static Future<void> setFullName(String name) async =>
+      await _p.setString('full_name', name);
+  static String? getFullNameSync() => _p.getString('full_name');
 }

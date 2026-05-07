@@ -159,8 +159,8 @@ class ActiveJobScreen extends GetView<ActiveJobController> {
           GestureDetector(
             onTap: controller.openChat,
             child: Container(
-              width: 42.w,
-              height: 42.w,
+              width: 50.w,
+              height: 50.w,
               decoration: const BoxDecoration(
                   color: Color(0xFF1565C0), shape: BoxShape.circle),
               child: Icon(Icons.chat_bubble_outline,
